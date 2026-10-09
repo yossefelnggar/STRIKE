@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b0d12">
+<title>STRIKE — احجز الماتش في ثواني</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0d12;--card:#131722;--b:rgba(255,255,255,.08);--t:#f1f5f9;--m:#94a3b8;--g:#22c55e;--gg:rgba(34,197,94,.15);--r:#ef4444;--rb:rgba(239,68,68,.12);--a:#f59e0b}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Cairo,sans-serif;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--t);min-height:100vh;padding-bottom:40px;font-size:14px}
+.wrap{width:min(640px,100% - 24px);margin:0 auto;padding-top:16px}
+header{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--card);border:1px solid var(--b);border-radius:16px;padding:12px 18px;margin-bottom:16px}
+.logo{font-size:22px;font-weight:900;color:#fff;text-decoration:none}.logo span{color:var(--g)}
+.pill{background:var(--gg);color:var(--g);border:1px solid rgba(34,197,94,.3);padding:6px 14px;border-radius:20px;font-size:13px;font-weight:700;text-decoration:none;cursor:pointer}
+.card{background:var(--card);border:1px solid var(--b);border-radius:16px;padding:18px;margin-bottom:14px}
+.m{color:var(--m);font-size:12px;font-weight:600}
+.fg{margin-bottom:12px}
+label{display:block;font-size:12px;font-weight:700;color:var(--m);margin-bottom:4px}
+input,select{width:100%;background:var(--bg);border:1px solid var(--b);border-radius:10px;padding:12px;color:var(--t);font-size:14px;outline:0;font-weight:600}
+input:focus,select:focus{border-color:var(--g)}
+.btn{width:100%;background:var(--g);color:#000;font-weight:800;border:0;border-radius:10px;padding:12px;font-size:14px;cursor:pointer;text-align:center;text-decoration:none;display:block}
+.btn:active{transform:scale(.98)}.btn:disabled{opacity:.6}
+.btn.a{background:var(--a)}.btn.w{background:#25d366;color:#fff}.btn.s{width:auto;padding:7px 12px;font-size:12px;display:inline-block}
+.link{background:0;border:0;color:var(--m);font-size:12px;font-weight:700;cursor:pointer;text-decoration:underline;display:block;margin:10px auto 0}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:12px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+.tab{background:var(--card);border:1px solid var(--b);color:var(--m);padding:8px 14px;border-radius:12px;font-weight:700;font-size:12px;white-space:nowrap;cursor:pointer;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:2px}
+.tab.on{background:var(--gg);border-color:var(--g);color:var(--g)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:var(--gg);border:1px solid var(--g);color:var(--g);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 0;border-bottom:1px solid var(--b)}.item:last-child{border:0}
+.tag{font-size:11px;padding:3px 9px;border-radius:12px;font-weight:800;background:var(--gg);color:var(--g)}
+.empty{text-align:center;color:var(--m);padding:20px}
+.sc{background:var(--card);border:1px solid var(--b);border-radius:16px;margin-bottom:14px;overflow:hidden}.sc.open{border-color:rgba(34,197,94,.4)}
+.sh{display:flex;justify-content:space-between;gap:10px;padding:16px 18px;cursor:pointer}
+.sb{display:none;padding:14px 18px 18px;border-top:1px solid var(--b)}.sc.open .sb{display:block}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}@media(max-width:400px){.grid{grid-template-columns:repeat(3,1fr)}}
+.slot{border:1px solid var(--b);border-radius:12px;padding:10px 4px;text-align:center;font-weight:800;font-size:13px}.slot small{display:block;font-size:10px;margin-top:2px}
+.slot.av{cursor:pointer;background:rgba(255,255,255,.02)}.slot.av small{color:var(--g)}.slot.av:active{background:var(--gg);border-color:var(--g)}
+.slot.bk{background:var(--rb);border-color:rgba(239,68,68,.2)}.slot.bk small{color:var(--r)}.slot.ps{opacity:.4}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .2s}.modal.open{opacity:1;pointer-events:auto}
+.box{background:#161b26;border:1px solid var(--b);border-radius:24px 24px 0 0;width:100%;max-width:640px;max-height:88vh;overflow:auto;padding:22px}
+.toast{position:fixed;top:20px;left:50%;transform:translate(-50%,-80px);background:var(--card);border:1px solid var(--b);color:#fff;padding:10px 20px;border-radius:30px;font-weight:700;font-size:13px;box-shadow:0 10px 25px rgba(0,0,0,.5);z-index:200;opacity:0;transition:.3s;max-width:92vw}.toast.show{transform:translate(-50%,0);opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="logo" href="index.html">STRIKE<span>.</span></a>
+    <div style="display:flex;gap:6px"><span class="pill" data-a="my">🎟️ حجوزاتي</span><a class="pill" href="owner.html">صاحب ملعب؟</a></div>
+  </header>
+  <div class="card" style="background:linear-gradient(135deg,#131722,#1c2333)">
+    <h1 style="font-size:18px;font-weight:800;margin-bottom:4px">حجز الماتش أسهل من التمريرة! ⚽⚡</h1>
+    <p class="m">اختار اليوم، افتح الملعب، واضغط على الميعاد المتاح.</p>
+  </div>
+  <div class="tabs" id="tabs"></div>
+  <input id="q" placeholder="🔍 ابحث باسم الملعب أو المنطقة (التجمع، زايد...)" style="margin-bottom:14px">
+  <div id="list"><div class="empty">جاري تحميل الملاعب... ⏳</div></div>
+</div>
+<div class="modal" id="md"><div class="box" id="mb"></div></div>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+import * as D from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+
+const db = D.getDatabase(initializeApp({
+  apiKey: "AIzaSyA953dxWl1Bmtibt2XiENFWhA5H3UYXIOY", authDomain: "football-129f.firebaseapp.com",
+  databaseURL: "https://football-129f1-default-rtdb.europe-west1.firebasedatabase.app", projectId: "football-129f",
+  appId: "1:67021423540:web:44ad608572099a34c568e1"
+}));
+const R = p => D.ref(db, "strike_data/" + p), $ = i => document.getElementById(i), $$ = q => [...document.querySelectorAll(q)];
+const DAYS = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+const FAC = ["إضاءة", "كافيه", "حمامات", "باركينج", "أرضية صناعي", "غرف ملابس"];
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const arr = x => Array.isArray(x) ? x.filter(v => v != null) : Object.values(x || {});
+const dk = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const fmt = h => { h %= 24; return `${String(h % 12 || 12).padStart(2, "0")}:00 ${h >= 12 ? "م" : "ص"}`; };
+const hours = s => { const o = Number.isInteger(s.openHour) ? s.openHour : 17; let c = Number.isInteger(s.closeHour) ? s.closeHour : 1; if (c <= o) c += 24; const r = []; for (let h = o; h < c; h++) r.push(h); return r; };
+const num = v => String(v).replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/\D/g, "");
+const okPhone = p => /^01[0125]\d{8}$/.test(p);
+const wa = (p, t = "") => `https://wa.me/20${p.slice(1)}?text=${encodeURIComponent(t)}`;
+const url = u => /^https?:\/\//i.test(u || "") ? esc(u) : "";
+const toast = m => { const t = $("toast"); t.textContent = m; t.classList.add("show"); clearTimeout(t.h); t.h = setTimeout(() => t.classList.remove("show"), 3500); };
+const err = e => { const c = String(e.code || e.message); return c.includes("PERMISSION") ? "مفيش صلاحية — طبّق قواعد الأمان في Firebase" : c; };
+const J = (k, d) => { try { return JSON.parse(localStorage[k]) || d; } catch { return d; } };
+
+let sel = dk(new Date()), st = null, paid = {}, slots = {}, cur = null, off = null;
+const opn = new Set();
+const md = $("md"), mb = $("mb"), show = h => { mb.innerHTML = h; md.classList.add("open"); }, hide = () => md.classList.remove("open");
+md.onclick = e => e.target == md && hide();
+$("tabs").innerHTML = [...Array(30)].map((_, i) => {
+  const d = new Date(); d.setDate(d.getDate() + i);
+  return `<div class="tab ${i ? "" : "on"}" data-a="day" data-k="${dk(d)}"><b>${i ? (i == 1 ? "بكرة" : DAYS[d.getDay()]) : "النهاردة"}</b><span style="font-size:10px;opacity:.7">${d.getDate()}/${d.getMonth() + 1}</span></div>`;
+}).join("");
+
+const fail = e => { $("list").innerHTML = `<div class="empty" style="color:var(--r)">${esc(err(e))}</div>`; };
+D.onValue(R("stadiums"), s => { st = s.val() || {}; draw(); }, fail);
+D.onValue(R("paid"), s => { paid = s.val() || {}; draw(); }, fail);
+function listen() { off && off(); off = D.onValue(R("slots/" + sel), s => { slots = s.val() || {}; draw(); }, fail); }
+listen();
+$("q").oninput = draw;
+// تنبيه لو الاتصال بالداتابيز مش بيحصل (غالباً databaseURL غلط)
+let conn = false; D.onValue(D.ref(db, ".info/connected"), s => { conn = s.val() === true; });
+const MSG = "⚠️ مش قادر أوصل لقاعدة البيانات. غالباً رابط الداتابيز (databaseURL) في أول الملف غلط — انسخه من Firebase ← Realtime Database ← Data (الرابط اللي فوق).";
+setTimeout(() => { if (!conn && st === null) $("list").innerHTML = `<div class="empty" style="color:var(--r);line-height:1.8">${MSG}</div>`; }, 8000);
+
+function draw() {
+  if (!st) return;
+  const q = $("q").value.trim().toLowerCase(), now = new Date(), isT = sel == dk(now);
+  const nh = now.getHours() + now.getMinutes() / 60, dow = new Date(sel + "T00:00:00").getDay();
+  // الملعب يظهر بس لو شغال واشتراك صاحبه ساري
+  const items = Object.entries(st).filter(([id, s]) => s && s.status == "active" && paid[s.ownerUid] > Date.now() && `${s.name} ${s.area}`.toLowerCase().includes(q));
+  if (!items.length) { $("list").innerHTML = `<div class="empty">مفيش ملاعب متاحة دلوقتي يا كابتن!</div>`; return; }
+  $("list").innerHTML = items.map(([id, s]) => {
+    const hs = hours(s), isOff = arr(s.daysOff).map(Number).includes(dow), taken = slots[id] || {}, op = opn.has(id);
+    const gone = h => isT && nh >= h;
+    const free = isOff ? 0 : hs.filter(h => !taken["h" + h] && !gone(h)).length;
+    const fac = arr(s.facilities).map(i => FAC[i] ? `<span class="chip">${FAC[i]}</span>` : "").join("");
+    const mp = url(s.mapUrl), ph = num(s.ownerPhone || "");
+    const links = `<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">${mp ? `<a class="btn s" target="_blank" rel="noopener" href="${mp}">📍 اللوكيشن</a>` : ""}${okPhone(ph) ? `<a class="btn s w" target="_blank" rel="noopener" href="${wa(ph)}">واتساب</a><a class="btn s a" href="tel:${ph}">اتصال</a>` : ""}</div>`;
+    const grid = isOff ? `<div class="empty" style="color:var(--r)">الملعب مقفول في اليوم ده 🚫</div>` :
+      `<div class="grid">${hs.map(h => taken["h" + h] ? `<div class="slot bk">${fmt(h)}<small>محجوز</small></div>` :
+        gone(h) ? `<div class="slot ps">${fmt(h)}<small>عدّى</small></div>` :
+          `<div class="slot av" data-a="book" data-id="${esc(id)}" data-h="${h}">${fmt(h)}<small>احجز 🔥</small></div>`).join("")}</div>`;
+    return `<div class="sc ${op ? "open" : ""}"><div class="sh" data-a="tg" data-id="${esc(id)}"><div>
+      <div style="font-size:16px;font-weight:800">${esc(s.name)}</div>
+      <div class="m">📍 ${esc(s.area)}${s.size ? ` • ⚽ ${esc(s.size)} ضد ${esc(s.size)}` : ""}</div>
+      <div class="m" style="color:var(--a)">🕒 ${fmt(hs[0])} ← ${fmt(hs[hs.length - 1] + 1)}</div></div>
+      <div style="text-align:left"><span class="tag">${esc(s.pricePerHour)} ج.م / ساعة</span>
+      <div class="m" style="margin-top:6px;color:${free ? "var(--g)" : "var(--r)"}">${isOff ? "مقفول" : free ? free + " ميعاد متاح" : "كامل العدد"}</div></div></div>
+      <div class="sb">${fac ? `<div class="chips" style="margin-bottom:10px">${fac}</div>` : ""}${links}${grid}</div></div>`;
+  }).join("");
+}
+
+const H = {
+  day: (d, b) => { sel = d.k; $$("[data-a=day]").forEach(x => x.classList.toggle("on", x == b)); slots = {}; draw(); listen(); },
+  tg: d => { opn.has(d.id) ? opn.delete(d.id) : opn.add(d.id); draw(); },
+  x: hide,
+  book: d => {
+    const s = st[d.id], me = J("strike_me", {}); cur = { id: d.id, h: +d.h, s };
+    show(`<h2 style="font-size:18px;font-weight:800">${esc(s.name)}</h2>
+      <p class="m" style="margin-bottom:14px">${sel} — ${fmt(d.h)} • ${esc(s.pricePerHour)} ج.م (الدفع في الملعب)</p>
+      <div class="fg"><label>اسم الكابتن</label><input id="bn" value="${esc(me.n || "")}" placeholder="مثال: الكابتن أحمد"></div>
+      <div class="fg"><label>رقم الموبايل للتأكيد</label><input id="bp" type="tel" inputmode="numeric" value="${esc(me.p || "")}" placeholder="01xxxxxxxxx"></div>
+      <div class="fg"><label>حالة الفرقة إيه؟</label><select id="br"><option>الرجالة جاهزة والماتش هيدولق 🔥</option><option>بنلم في الفرقة بالعافية ⏳</option></select></div>
+      <button class="btn" data-a="go">قفل على الميعاد ده 🔒</button><button class="link" data-a="x">إلغاء</button>`);
+  },
+  go: async (_, b) => {
+    const n = $("bn").value.trim().slice(0, 40), p = num($("bp").value);
+    if (n.length < 2) return toast("اكتب اسمك");
+    if (!okPhone(p)) return toast("رقم الموبايل غير صحيح");
+    const { id, h, s } = cur, code = "STK-" + Math.floor(1000 + Math.random() * 9000);
+    b.disabled = true;
+    try {
+      // كتابة ذرية: لو الميعاد اتحجز قبلك العملية كلها بتترفض
+      await D.update(D.ref(db), {
+        [`strike_data/slots/${sel}/${id}/h${h}`]: true,
+        [`strike_data/bookings/${id}/${sel}/h${h}`]: { name: n, phone: p, ready: $("br").value, code, hour: fmt(h), price: Number(s.pricePerHour) || 0, ts: Date.now() }
+      });
+      localStorage.strike_me = JSON.stringify({ n, p });
+      localStorage.strike_my = JSON.stringify([{ code, date: sel, hour: fmt(h), stadium: s.name, phone: s.ownerPhone || "" }, ...J("strike_my", [])].slice(0, 30));
+      const t = `يا رجالة الماتش اتقفل! ⚽🔥\n📍 ${s.name}\n📅 ${sel}\n⏰ ${fmt(h)}\n👤 الكابتن ${n}\n🎟️ #${code}\nجاهزين؟ ⚡`;
+      show(`<div style="text-align:center"><div style="font-size:40px">🎉</div>
+        <h2 style="font-size:18px;font-weight:800">مبروك يا كابتن! الماتش اتسجل</h2>
+        <p class="m" style="margin:6px 0 14px">كود الحجز <b style="color:var(--g)">#${code}</b> — محفوظ في "حجوزاتي"</p>
+        <a class="btn w" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(t)}">ابعت التفاصيل لجروب الفرقة 📲</a>
+        <button class="link" data-a="x">إغلاق</button></div>`);
+    } catch (e) {
+      toast(String(e.code || e.message).includes("PERMISSION") ? "الميعاد ده اتحجز قبلك يا كابتن! جرب ميعاد تاني" : err(e));
+      hide();
+    } finally { b.disabled = false; }
+  },
+  my: () => {
+    const t = dk(new Date()), l = J("strike_my", []).filter(x => x.date >= t);
+    show(`<h2 style="font-size:18px;font-weight:800;margin-bottom:8px">حجوزاتي 🎟️</h2>${l.map(x => `<div class="item"><div><b>${esc(x.stadium)}</b>
+      <div class="m">${esc(x.date)} • ${esc(x.hour)} • #${esc(x.code)}</div></div>${okPhone(num(x.phone)) ? `<a class="btn s w" target="_blank" rel="noopener" href="${wa(num(x.phone), "بخصوص حجز #" + x.code)}">كلّم الملعب</a>` : ""}</div>`).join("") || `<div class="empty">مفيش حجوزات جاية لسه.</div>`}
+      <button class="link" data-a="x">إغلاق</button>`);
+  }
+};
+document.addEventListener("click", e => { const b = e.target.closest("[data-a]"); if (b && H[b.dataset.a]) H[b.dataset.a](b.dataset, b); });
+</script>
+</body>
+</html>

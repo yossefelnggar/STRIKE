@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b0d12">
+<title>STRIKE — لوحة تحكم صاحب الملعب</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0d12;--card:#131722;--b:rgba(255,255,255,.08);--t:#f1f5f9;--m:#94a3b8;--g:#22c55e;--gg:rgba(34,197,94,.15);--r:#ef4444;--rb:rgba(239,68,68,.12);--a:#f59e0b;--ab:rgba(245,158,11,.12)}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Cairo,sans-serif;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--t);min-height:100vh;padding-bottom:40px;font-size:14px}
+.wrap{width:min(640px,100% - 24px);margin:0 auto;padding-top:16px}
+header{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--card);border:1px solid var(--b);border-radius:16px;padding:12px 18px;margin-bottom:16px}
+.logo{font-size:22px;font-weight:900;color:#fff;text-decoration:none}.logo span{color:var(--g)}
+.pill{background:var(--gg);color:var(--g);border:1px solid rgba(34,197,94,.3);padding:6px 14px;border-radius:20px;font-size:13px;font-weight:700;text-decoration:none;cursor:pointer}
+.card{background:var(--card);border:1px solid var(--b);border-radius:16px;padding:18px;margin-bottom:14px}
+.m{color:var(--m);font-size:12px;font-weight:600}
+.fg{margin-bottom:12px}
+label{display:block;font-size:12px;font-weight:700;color:var(--m);margin-bottom:4px}
+input,select{width:100%;background:var(--bg);border:1px solid var(--b);border-radius:10px;padding:12px;color:var(--t);font-size:14px;outline:0;font-weight:600}
+input:focus,select:focus{border-color:var(--g)}
+.btn{width:100%;background:var(--g);color:#000;font-weight:800;border:0;border-radius:10px;padding:12px;font-size:14px;cursor:pointer;text-align:center;text-decoration:none;display:block}
+.btn:active{transform:scale(.98)}.btn:disabled{opacity:.6}
+.btn.a{background:var(--a)}.btn.r{background:var(--rb);color:var(--r);border:1px solid rgba(239,68,68,.3)}.btn.w{background:#25d366;color:#fff}
+.btn.s{width:auto;padding:7px 12px;font-size:12px;display:inline-block}
+.link{background:0;border:0;color:var(--m);font-size:12px;font-weight:700;cursor:pointer;text-decoration:underline;display:block;margin:10px auto 0}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:12px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+.tab{background:var(--card);border:1px solid var(--b);color:var(--m);padding:8px 14px;border-radius:12px;font-weight:700;font-size:12px;white-space:nowrap;cursor:pointer;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:2px}
+.tab.on{background:var(--gg);border-color:var(--g);color:var(--g)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:var(--bg);border:1px solid var(--b);color:var(--m);padding:6px 10px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;user-select:none}
+.chip.on{background:var(--gg);border-color:var(--g);color:var(--g)}.chip.off.on{background:var(--rb);border-color:rgba(239,68,68,.5);color:var(--r)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 0;border-bottom:1px solid var(--b)}.item:last-child{border:0}
+.empty{text-align:center;color:var(--m);padding:20px}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center}.stats b{display:block;font-size:20px;font-weight:900;color:var(--g)}
+.cash{background:var(--ab);border:1px dashed var(--a);border-radius:12px;padding:14px;margin:12px 0;text-align:center}
+.cash b{display:block;font-size:20px;font-weight:900;color:var(--a);letter-spacing:1px;margin:6px 0}
+.toast{position:fixed;top:20px;left:50%;transform:translate(-50%,-80px);background:var(--card);border:1px solid var(--b);color:#fff;padding:10px 20px;border-radius:30px;font-weight:700;font-size:13px;box-shadow:0 10px 25px rgba(0,0,0,.5);z-index:200;opacity:0;transition:.3s;max-width:92vw}.toast.show{transform:translate(-50%,0);opacity:1}
+</style>
+<script>
+(function(){
+  function box(m){var d=document.getElementById("ae");if(d)d.textContent="⚠️ "+m}
+  addEventListener("error",function(e){box(e.message?("خطأ في الصفحة: "+e.message):"تعذر تحميل مكتبة Firebase — تأكد من الإنترنت ومن إن الصفحة مفتوحة من رابط الاستضافة")},true);
+  addEventListener("unhandledrejection",function(e){box("خطأ: "+((e.reason&&(e.reason.code||e.reason.message))||e.reason))});
+  addEventListener("DOMContentLoaded",function(){if(location.protocol==="file:")box("الصفحة مفتوحة من الملف مباشرة. ارفعها على استضافة (Netlify / Firebase Hosting / GitHub Pages) وافتحها من الرابط، لأن تسجيل الدخول مش بيشتغل من file://")});
+})();
+</script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="logo" href="index.html">STRIKE<span>.</span></a>
+    <div style="display:flex;gap:6px"><span class="pill" id="hOut" data-a="out" hidden>خروج</span><a class="pill" href="index.html">الرئيسية ⚽</a></div>
+  </header>
+
+  <div class="card" id="vAuth">
+    <h2 id="aT" style="font-size:18px;font-weight:800;margin-bottom:6px">دخول صاحب الملعب 🔐</h2>
+    <p class="m" style="margin-bottom:14px">سجّل برقم موبايلك وكلمة سر عشان تتحكم في ملاعبك وحجوزاتك.</p>
+    <div class="fg" id="nm" hidden><label>اسمك / اسم النشاط</label><input id="an" placeholder="مثال: أحمد"></div>
+    <div class="fg"><label>رقم المحمول</label><input id="ap" type="tel" inputmode="numeric" placeholder="01xxxxxxxxx"></div>
+    <div class="fg"><label>كلمة السر (6 حروف على الأقل)</label><input id="aw" type="password" placeholder="******"></div>
+    <button class="btn" id="ab" data-a="auth">دخول اللوحة 🚀</button>
+    <button class="link" id="am" data-a="mode">معندكش حساب؟ سجّل دلوقتي</button>
+    <p class="m" id="ae" style="color:var(--r);margin-top:10px;line-height:1.7;word-break:break-word"></p>
+  </div>
+
+  <div class="card" id="vLoad" hidden style="text-align:center">
+    <div style="font-size:34px">⏳</div><p class="m" style="margin:6px 0">جاري تحميل حسابك...</p>
+    <p class="m" id="le" style="color:var(--r);line-height:1.8;word-break:break-word"></p>
+    <button class="link" data-a="out">تسجيل خروج</button>
+  </div>
+
+  <div class="card" id="vSub" hidden>
+    <h2 style="font-size:18px;font-weight:800;color:var(--a);margin-bottom:6px">تفعيل الاشتراك ⚠️</h2>
+    <p class="m">عشان ملاعبك تظهر للاعبين ويتحجز عليها أونلاين، ادفع اشتراك 500 جنيه شهرياً.</p>
+    <p class="m" id="sn" style="color:var(--r);margin-top:6px"></p>
+    <div class="cash"><div class="m">حوّل المبلغ على محفظة اتصالات كاش:</div><b id="cn">01145473068</b>
+      <button class="btn s a" data-a="copy">نسخ الرقم 📋</button><div class="m" style="margin-top:6px">اسم المحفظة: عبد الفتاح</div></div>
+    <div class="fg"><label>رقم المحفظة اللي حوّلت منها</label><input id="sp" type="tel" inputmode="numeric" placeholder="01xxxxxxxxx"></div>
+    <div class="fg"><label>رقم العملية / الرقم المرجعي</label><input id="st" placeholder="الموجود في رسالة التحويل"></div>
+    <button class="btn a" data-a="paysub">تأكيد وإرسال الطلب 📩</button>
+    <button class="link" id="bk" data-a="back" hidden>رجوع للوحة</button>
+  </div>
+
+  <div class="card" id="vWait" hidden style="text-align:center;border-color:var(--a)">
+    <div style="font-size:40px">⏳</div>
+    <h3 style="font-size:18px;font-weight:900;color:var(--a);margin:6px 0">طلبك قيد المراجعة</h3>
+    <p class="m">هيتفعل حسابك تلقائياً أول ما الأدمن يأكد التحويل — مش محتاج تعمل حاجة.</p>
+  </div>
+
+  <div id="vDash" hidden>
+    <div class="card" id="top" style="display:flex;justify-content:space-between;align-items:center"></div>
+    <div class="tabs">
+      <div class="tab on" data-a="tab" data-t="pB">📅 الحجوزات</div>
+      <div class="tab" data-a="tab" data-t="pS">🏟️ ملاعبي</div>
+      <div class="tab" data-a="tab" data-t="pN">➕ إضافة ملعب</div>
+    </div>
+
+    <div id="pB">
+      <div class="tabs" id="dt"></div>
+      <div class="card stats" id="sum"></div>
+      <div class="card">
+        <div style="font-weight:800;margin-bottom:8px">حجز يدوي (تليفون / واتساب) ➕</div>
+        <div class="row"><div><label>الملعب</label><select id="ms"></select></div><div><label>الميعاد</label><select id="mh"></select></div></div>
+        <div class="row"><div><label>اسم الكابتن</label><input id="mn" placeholder="اختياري"></div><div><label>الموبايل</label><input id="mp" type="tel" inputmode="numeric" placeholder="اختياري"></div></div>
+        <button class="btn" data-a="man">سجّل الحجز</button>
+      </div>
+      <div class="card" id="bl"></div>
+    </div>
+    <div id="pS" hidden></div>
+    <div id="pN" class="card" hidden><div style="font-weight:800;margin-bottom:12px">إضافة ملعب جديد 🔥</div><div id="nf"></div><button class="btn" data-a="add">نزّل الملعب على السيستم 🚀</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+import * as D from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+import * as U from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+
+const app = initializeApp({
+  apiKey: "AIzaSyA953dxWl1Bmtibt2XiENFWhA5H3UYXIOY", authDomain: "football-129f.firebaseapp.com",
+  databaseURL: "https://football-129f1-default-rtdb.europe-west1.firebasedatabase.app", projectId: "football-129f",
+  appId: "1:67021423540:web:44ad608572099a34c568e1"
+});
+const db = D.getDatabase(app), auth = U.getAuth(app);
+const R = p => D.ref(db, "strike_data/" + p), $ = i => document.getElementById(i), $$ = q => [...document.querySelectorAll(q)];
+const DAYS = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+const FAC = ["إضاءة", "كافيه", "حمامات", "باركينج", "أرضية صناعي", "غرف ملابس"], SIZES = [5, 6, 7, 8, 11];
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const arr = x => Array.isArray(x) ? x.filter(v => v != null) : Object.values(x || {});
+const dk = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const fmt = h => { h %= 24; return `${String(h % 12 || 12).padStart(2, "0")}:00 ${h >= 12 ? "م" : "ص"}`; };
+const hours = s => { const o = Number.isInteger(s.openHour) ? s.openHour : 17; let c = Number.isInteger(s.closeHour) ? s.closeHour : 1; if (c <= o) c += 24; const r = []; for (let h = o; h < c; h++) r.push(h); return r; };
+const num = v => String(v).replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/\D/g, "");
+const okPhone = p => /^01[0125]\d{8}$/.test(p);
+const wa = (p, t = "") => `https://wa.me/20${p.slice(1)}?text=${encodeURIComponent(t)}`;
+const toast = m => { const t = $("toast"); t.textContent = m; t.classList.add("show"); clearTimeout(t.h); t.h = setTimeout(() => t.classList.remove("show"), 3500); };
+const err = e => {
+  const c = String(e.code || e.message);
+  return ({ "auth/admin-restricted-operation": "التسجيل الجديد متوقف من إعدادات Firebase", "auth/configuration-not-found": "فعّل Authentication من Firebase (Get started) وبعدين Email/Password",
+    "auth/invalid-api-key": "مفتاح Firebase غير صحيح", "auth/password-does-not-meet-requirements": "كلمة السر لازم تكون أقوى (حروف وأرقام)", "auth/unauthorized-domain": "دومين الموقع غير مصرح في Firebase ← Authentication ← Settings ← Authorized domains",
+    "auth/operation-not-supported-in-this-environment": "افتح الصفحة من رابط استضافة مش من الملف مباشرة", "auth/invalid-credential": "الرقم أو كلمة السر غلط", "auth/wrong-password": "الرقم أو كلمة السر غلط", "auth/user-not-found": "الحساب مش موجود، سجّل الأول",
+    "auth/email-already-in-use": "الرقم ده مسجل قبل كده، سجّل دخول", "auth/weak-password": "كلمة السر ضعيفة (6 حروف على الأقل)",
+    "auth/operation-not-allowed": "فعّل Email/Password من Firebase ← Authentication", "auth/network-request-failed": "مفيش إنترنت",
+    "auth/too-many-requests": "محاولات كتير، جرب بعد شوية" })[c] || (c.includes("PERMISSION") ? "مفيش صلاحية — طبّق قواعد الأمان في Firebase" : c);
+};
+
+let me = null, reg = false, paid = 0, sub = null, sts = {}, bks = {}, sel = dk(new Date()), ready = false, un = [], bu = [], sig = "";
+// تنبيه لو الاتصال بالداتابيز مش بيحصل (غالباً databaseURL غلط)
+let conn = false; D.onValue(D.ref(db, ".info/connected"), s => { conn = s.val() === true; });
+const MSG = "⚠️ مش قادر أوصل لقاعدة البيانات. غالباً رابط الداتابيز (databaseURL) في أول الملف غلط — انسخه من Firebase ← Realtime Database ← Data (الرابط اللي فوق).";
+setTimeout(() => { if (!conn && !$("vLoad").hidden) $("le").textContent = MSG; }, 8000);
+const show = id => ["vAuth", "vLoad", "vSub", "vWait", "vDash"].forEach(x => $(x).hidden = x != id);
+
+// ===== الدخول (Firebase Auth حقيقي — الرقم @strike.app) =====
+U.onAuthStateChanged(auth, u => {
+  un.forEach(f => f()); un = []; bu.forEach(f => f()); bu = [];
+  ready = false; sig = ""; paid = 0; sub = null; sts = {}; bks = {};
+  $("hOut").hidden = !u;
+  if (!u) { me = null; show("vAuth"); return; }
+  show("vLoad"); $("le").textContent = "";
+  me = { uid: u.uid, phone: (u.email || "").split("@")[0] };
+  un.push(D.onValue(R("paid/" + u.uid), s => { paid = s.val() || 0; gate(); }, loadErr));
+  un.push(D.onValue(R("subscriptions/" + u.uid), s => { sub = s.val(); gate(); }, loadErr));
+});
+
+function loadErr(e) { toast(err(e)); $("le").textContent = "⚠️ " + err(e) + " [" + (e.code || e.message) + "]"; if (!$("vLoad").hidden) return; }
+
+function gate() {
+  if (paid > Date.now()) return dash();
+  if (sub && sub.status == "pending") return show("vWait");
+  $("sn").textContent = sub && sub.status == "rejected" ? "الطلب السابق اترفض، راجع بيانات التحويل وابعت تاني." : paid ? "اشتراكك انتهى، جدّد عشان ملاعبك ترجع تظهر." : "";
+  $("bk").hidden = true; show("vSub");
+}
+
+function dash() {
+  show("vDash");
+  const n = Math.ceil((paid - Date.now()) / 864e5);
+  $("top").innerHTML = `<div><b>أهلاً بيك 👋</b><div class="m">اشتراكك ساري ${n} يوم</div></div>${n <= 5 ? `<button class="btn s a" data-a="renew">جدّد</button>` : ""}`;
+  if (ready) return; ready = true;
+  $("dt").innerHTML = [...Array(14)].map((_, i) => {
+    const d = new Date(); d.setDate(d.getDate() + i);
+    return `<div class="tab ${i ? "" : "on"}" data-a="day" data-k="${dk(d)}"><b>${i ? (i == 1 ? "بكرة" : DAYS[d.getDay()]) : "النهاردة"}</b><span style="font-size:10px;opacity:.7">${d.getDate()}/${d.getMonth() + 1}</span></div>`;
+  }).join("");
+  $("nf").innerHTML = fields("x");
+  $("ms").onchange = fillManual;
+  un.push(D.onValue(D.query(R("stadiums"), D.orderByChild("ownerUid"), D.equalTo(me.uid)), s => { sts = s.val() || {}; subB(); drawS(); drawB(); }, e => toast(err(e))));
+}
+
+// نسمع حجوزات كل ملعب من النهاردة وطالع
+function subB() {
+  bu.forEach(f => f());
+  bu = Object.keys(sts).map(id => D.onValue(D.query(R("bookings/" + id), D.orderByKey(), D.startAt(dk(new Date()))), s => { bks[id] = s.val() || {}; drawB(); }, e => toast(err(e))));
+}
+
+// ===== نموذج الملعب (مشترك بين الإضافة والتعديل) =====
+const hopt = v => [...Array(24)].map((_, h) => `<option value="${h}"${h == v ? " selected" : ""}>${fmt(h)}</option>`).join("");
+const chips = (list, on, cls = "") => list.map((x, i) => `<div class="chip ${cls} ${on.includes(i) ? "on" : ""}" data-v="${i}" onclick="this.classList.toggle('on')">${x}</div>`).join("");
+const fields = (p, s = {}) => `
+  <div class="fg"><label>اسم الملعب</label><input id="${p}n" value="${esc(s.name || "")}" placeholder="مثال: ملعب الماركيز"></div>
+  <div class="fg"><label>المنطقة / العنوان</label><input id="${p}a" value="${esc(s.area || "")}" placeholder="القاهرة - المعادي"></div>
+  <div class="row"><div><label>سعر الساعة (ج.م)</label><input id="${p}p" type="number" inputmode="numeric" min="1" value="${s.pricePerHour ?? ""}"></div>
+  <div><label>عدد اللاعبين</label><select id="${p}z">${SIZES.map(z => `<option value="${z}"${z == (s.size || 5) ? " selected" : ""}>${z} ضد ${z}</option>`).join("")}</select></div></div>
+  <div class="fg"><label>لوكيشن Google Maps (اختياري)</label><input id="${p}m" type="url" value="${esc(s.mapUrl || "")}" placeholder="https://maps.google.com/..."></div>
+  <div class="row"><div><label>🕒 يفتح</label><select id="${p}o">${hopt(s.openHour ?? 17)}</select></div><div><label>🔒 يقفل</label><select id="${p}c">${hopt(s.closeHour ?? 1)}</select></div></div>
+  <label>المميزات</label><div class="chips" id="${p}f" style="margin-bottom:12px">${chips(FAC, arr(s.facilities).map(Number))}</div>
+  <label>أيام الإجازة (الملعب مقفول)</label><div class="chips" id="${p}d" style="margin-bottom:14px">${chips(DAYS, arr(s.daysOff).map(Number), "off")}</div>`;
+const picked = id => $$(`#${id} .chip.on`).map(c => +c.dataset.v);
+const read = p => ({ name: $(p + "n").value.trim(), area: $(p + "a").value.trim(), pricePerHour: +$(p + "p").value, size: +$(p + "z").value, mapUrl: $(p + "m").value.trim(),
+  openHour: +$(p + "o").value, closeHour: +$(p + "c").value, facilities: picked(p + "f"), daysOff: picked(p + "d") });
+const bad = v => !v.name || !v.area || !(v.pricePerHour > 0) ? "كمّل الاسم والمنطقة والسعر" : v.openHour == v.closeHour ? "ميعاد الفتح والإقفال لازم يختلفوا" : "";
+
+function drawS() {
+  const g = JSON.stringify(sts); if (g == sig) return; sig = g; // ما نمسحش اللي بيتعدل
+  $("pS").innerHTML = Object.entries(sts).map(([id, s]) => `<div class="card">
+    <div class="item" style="padding-top:0"><div><b>${esc(s.name)}</b><div class="m">📍 ${esc(s.area)}</div></div>
+    <button class="btn s ${s.status == "active" ? "" : "r"}" data-a="tg" data-id="${id}">${s.status == "active" ? "شغال ✅" : "موقف 🚫"}</button></div>
+    ${fields(id, s)}<div class="row"><button class="btn" data-a="sv" data-id="${id}">حفظ 💾</button><button class="btn r" data-a="del" data-id="${id}">حذف 🗑️</button></div></div>`).join("")
+    || `<div class="empty">لسه مفيش ملاعب. أضف ملعبك الأول من تبويب "إضافة ملعب".</div>`;
+}
+
+// ===== الحجوزات =====
+function drawB() {
+  const rows = [], dow = new Date(sel + "T00:00:00").getDay();
+  let free = 0;
+  Object.entries(sts).forEach(([id, s]) => {
+    const day = (bks[id] || {})[sel] || {};
+    Object.entries(day).forEach(([k, b]) => rows.push({ id, k, h: +k.slice(1), b }));
+    if (s.status == "active" && !arr(s.daysOff).map(Number).includes(dow)) free += Math.max(0, hours(s).length - Object.keys(day).length);
+  });
+  rows.sort((a, b) => a.h - b.h);
+  $("sum").innerHTML = `<div><b>${rows.length}</b><span class="m">حجز</span></div><div><b>${rows.reduce((t, r) => t + (+r.b.price || 0), 0)}</b><span class="m">ج.م إيراد</span></div><div><b>${free}</b><span class="m">ساعة فاضية</span></div>`;
+  $("bl").innerHTML = rows.map(r => { const ph = num(r.b.phone || ""), ok = okPhone(ph); return `<div class="item"><div>
+    <div style="color:var(--g);font-weight:900">⏰ ${fmt(r.h)} — ${esc(sts[r.id].name)}</div>
+    <div style="font-weight:800">👤 ${esc(r.b.name)}</div><div class="m">${ok ? "📞 " + ph : ""} ${esc(r.b.ready || "")}</div></div>
+    <div style="display:flex;flex-direction:column;gap:6px">${ok ? `<a class="btn s w" target="_blank" rel="noopener" href="${wa(ph)}">واتساب</a><a class="btn s a" href="tel:${ph}">اتصال</a>` : ""}
+    <button class="btn s r" data-a="cancel" data-id="${r.id}" data-k="${r.k}">إلغاء ❌</button></div></div>`; }).join("") || `<div class="empty">مفيش حجوزات في اليوم ده.</div>`;
+  fillManual();
+}
+function fillManual() {
+  const ids = Object.keys(sts), ms = $("ms"), cur = ms.value;
+  ms.innerHTML = ids.map(id => `<option value="${id}">${esc(sts[id].name)}</option>`).join("");
+  if (ids.includes(cur)) ms.value = cur;
+  const mh = $("mh"), c2 = mh.value, id = ms.value;
+  if (!id) { mh.innerHTML = ""; return; }
+  const taken = (bks[id] || {})[sel] || {};
+  mh.innerHTML = hours(sts[id]).filter(h => !taken["h" + h]).map(h => `<option value="${h}">${fmt(h)}</option>`).join("");
+  if ([...mh.options].some(o => o.value == c2)) mh.value = c2;
+}
+const put = (id, d, h, b) => D.update(D.ref(db), { [`strike_data/slots/${d}/${id}/h${h}`]: true, [`strike_data/bookings/${id}/${d}/h${h}`]: b });
+
+// ===== الأزرار =====
+const H = {
+  mode: () => { reg = !reg; $("nm").hidden = !reg; $("aT").textContent = reg ? "حساب صاحب ملعب جديد ✨" : "دخول صاحب الملعب 🔐";
+    $("ab").textContent = reg ? "إنشاء الحساب 🚀" : "دخول اللوحة 🚀"; $("am").textContent = reg ? "عندي حساب، دخول" : "معندكش حساب؟ سجّل دلوقتي"; },
+  auth: async (_, b) => {
+    const p = num($("ap").value), w = $("aw").value, n = $("an").value.trim();
+    if (!okPhone(p)) return toast("رقم الموبايل غير صحيح");
+    if (w.length < 6) return toast("كلمة السر 6 حروف على الأقل");
+    if (reg && !n) return toast("اكتب اسمك");
+    b.disabled = true; $("ae").textContent = "";
+    try {
+      if (reg) { const c = await U.createUserWithEmailAndPassword(auth, p + "@strike.app", w); await D.set(R("owners/" + c.user.uid), { phone: p, name: n, createdAt: Date.now() }); }
+      else await U.signInWithEmailAndPassword(auth, p + "@strike.app", w);
+    } catch (e) { toast(err(e)); $("ae").textContent = "⚠️ " + err(e) + " [" + (e.code || e.message) + "]"; } finally { b.disabled = false; }
+  },
+  out: () => U.signOut(auth),
+  copy: () => { try { navigator.clipboard.writeText($("cn").textContent); } catch { } toast("تم نسخ الرقم: " + $("cn").textContent); },
+  paysub: async (_, b) => {
+    const s = num($("sp").value), t = $("st").value.trim();
+    if (!okPhone(s) || t.length < 4) return toast("اكتب رقم المحفظة ورقم العملية");
+    b.disabled = true;
+    try { await D.set(R("subscriptions/" + me.uid), { phone: me.phone, sender: s, trx: t, status: "pending", date: Date.now() }); toast("اتبعت الطلب ✅"); }
+    catch (e) { toast(err(e)); } finally { b.disabled = false; }
+  },
+  renew: () => { show("vSub"); $("bk").hidden = false; }, back: () => show("vDash"),
+  tab: (d, b) => { $$("[data-a=tab]").forEach(x => x.classList.toggle("on", x == b)); ["pB", "pS", "pN"].forEach(x => $(x).hidden = x != d.t); },
+  day: (d, b) => { sel = d.k; $$("#dt .tab").forEach(x => x.classList.toggle("on", x == b)); drawB(); },
+  man: async (_, b) => {
+    const id = $("ms").value, h = $("mh").value;
+    if (!id || h === "") return toast("اختار ملعب وميعاد فاضي");
+    const p = num($("mp").value);
+    b.disabled = true;
+    try {
+      await put(id, sel, h, { name: $("mn").value.trim().slice(0, 40) || "حجز يدوي", phone: okPhone(p) ? p : "-", ready: "حجز يدوي", code: "MAN", hour: fmt(+h), price: Number(sts[id].pricePerHour) || 0, ts: Date.now() });
+      $("mn").value = ""; $("mp").value = ""; toast("تم تسجيل الحجز ✅");
+    } catch (e) { toast(err(e)); } finally { b.disabled = false; }
+  },
+  cancel: async d => {
+    if (!confirm("تأكيد إلغاء الحجز ده؟")) return;
+    try { await D.update(D.ref(db), { [`strike_data/slots/${sel}/${d.id}/${d.k}`]: null, [`strike_data/bookings/${d.id}/${sel}/${d.k}`]: null }); toast("تم إلغاء الحجز"); }
+    catch (e) { toast(err(e)); }
+  },
+  tg: async d => { try { await D.set(R(`stadiums/${d.id}/status`), sts[d.id].status == "active" ? "inactive" : "active"); } catch (e) { toast(err(e)); } },
+  sv: async d => {
+    const v = read(d.id), m = bad(v); if (m) return toast(m);
+    try { await D.update(R("stadiums/" + d.id), v); toast("تم حفظ التعديلات ✅"); } catch (e) { toast(err(e)); }
+  },
+  del: async d => {
+    if (!confirm("تأكيد حذف الملعب نهائياً؟")) return;
+    try { await D.remove(R("stadiums/" + d.id)); toast("تم حذف الملعب"); } catch (e) { toast(err(e)); }
+  },
+  add: async (_, b) => {
+    const v = read("x"), m = bad(v); if (m) return toast(m);
+    const id = "st_" + Date.now(); b.disabled = true;
+    try {
+      await D.set(R("stadiums/" + id), { ...v, id, status: "active", ownerUid: me.uid, ownerPhone: me.phone });
+      $("nf").innerHTML = fields("x"); toast("تم تنزيل الملعب بنجاح 🔥");
+      H.tab({ t: "pS" }, $$("[data-a=tab]")[1]);
+    } catch (e) { toast(err(e)); } finally { b.disabled = false; }
+  }
+};
+document.addEventListener("click", e => { const b = e.target.closest("[data-a]"); if (b && H[b.dataset.a]) H[b.dataset.a](b.dataset, b); });
+</script>
+</body>
+</html>
