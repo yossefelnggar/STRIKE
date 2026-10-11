@@ -102,12 +102,15 @@ input:focus,select:focus{border-color:var(--g)}
     <div id="pB">
       <div class="tabs" id="dt"></div>
       <div class="card stats" id="sum"></div>
+      <div class="card" id="rev"></div>
       <div class="card">
         <div style="font-weight:800;margin-bottom:8px">حجز يدوي (تليفون / واتساب) ➕</div>
         <div class="row"><div><label>الملعب</label><select id="ms"></select></div><div><label>الميعاد</label><select id="mh"></select></div></div>
         <div class="row"><div><label>اسم الكابتن</label><input id="mn" placeholder="اختياري"></div><div><label>الموبايل</label><input id="mp" type="tel" inputmode="numeric" placeholder="اختياري"></div></div>
+        <div class="fg"><label>🔁 تكرار أسبوعي (حجز ثابت)</label><select id="mr"><option value="1">مرة واحدة</option><option value="4">4 أسابيع</option><option value="8">8 أسابيع</option><option value="12">12 أسبوع</option></select></div>
         <button class="btn" data-a="man">سجّل الحجز</button>
       </div>
+      <div class="card" id="cx" hidden></div>
       <div class="card" id="bl"></div>
     </div>
     <div id="pS" hidden></div>
@@ -137,7 +140,13 @@ const fmt = h => { h %= 24; return `${String(h % 12 || 12).padStart(2, "0")}:00 
 const hours = s => { const o = Number.isInteger(s.openHour) ? s.openHour : 17; let c = Number.isInteger(s.closeHour) ? s.closeHour : 1; if (c <= o) c += 24; const r = []; for (let h = o; h < c; h++) r.push(h); return r; };
 const num = v => String(v).replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/\D/g, "");
 const okPhone = p => /^01[0125]\d{8}$/.test(p);
+const biz = () => new Date(Date.now() - 6 * 36e5); // يوم العمل بيبدأ 6 الصبح (مواعيد بعد نص الليل تفضل على نفس اليوم)
+const bizNh = () => { const b = biz(); return (Date.now() - new Date(b.getFullYear(), b.getMonth(), b.getDate())) / 36e5; };
+const priceAt = (s, h) => { const base = Number(s.pricePerHour) || 0, o = Number.isInteger(s.openHour) ? s.openHour : 17; let p = s.peakFrom; if (!(+s.peakPrice > 0) || !Number.isInteger(p)) return base; if (p < o) p += 24; return h >= p ? +s.peakPrice : base; };
 const wa = (p, t = "") => `https://wa.me/20${p.slice(1)}?text=${encodeURIComponent(t)}`;
+const FIKEY = "6d207e02198a847aa98d0a2a901485a5";
+const shrink = (f, max, q, lim) => new Promise((ok, no) => { const im = new Image(), u = URL.createObjectURL(f); im.onload = () => { const z = Math.min(1, max / Math.max(im.width, im.height)), c = document.createElement("canvas"); c.width = Math.round(im.width * z); c.height = Math.round(im.height * z); c.getContext("2d").drawImage(im, 0, 0, c.width, c.height); let r = c.toDataURL("image/jpeg", q); while (r.length > lim && q > .3) { q -= .1; r = c.toDataURL("image/jpeg", q); } URL.revokeObjectURL(u); ok(r); }; im.onerror = () => no(new Error("صورة غير صالحة")); im.src = u; });
+const freeUp = async d => { const fd = new FormData(); fd.append("key", FIKEY); fd.append("action", "upload"); fd.append("format", "json"); fd.append("source", d.split(",")[1]); const r = await fetch("https://freeimage.host/api/1/upload", { method: "POST", body: fd }), j = await r.json(), u = j && j.image && (j.image.display_url || j.image.url); if (!u) throw new Error("فشل رفع الصورة"); return u.replace(/^http:/, "https:"); };
 const toast = m => { const t = $("toast"); t.textContent = m; t.classList.add("show"); clearTimeout(t.h); t.h = setTimeout(() => t.classList.remove("show"), 3500); };
 const err = e => {
   const c = String(e.code || e.message);
@@ -149,8 +158,9 @@ const err = e => {
     "auth/too-many-requests": "محاولات كتير، جرب بعد شوية" })[c] || (c.includes("PERMISSION") ? "مفيش صلاحية — طبّق قواعد الأمان في Firebase" : c);
 };
 
-let me = null, reg = false, paid = 0, sub = null, sts = {}, bks = {}, sel = dk(new Date()), ready = false, un = [], bu = [], sig = "";
+let me = null, reg = false, paid = 0, sub = null, sts = {}, bks = {}, sel = dk(biz()), ready = false, un = [], bu = [], sig = "";
 // تنبيه لو الاتصال بالداتابيز مش بيحصل (غالباً databaseURL غلط)
+let so = 0; D.onValue(D.ref(db, ".info/serverTimeOffset"), s => { so = s.val() || 0; });
 let conn = false; D.onValue(D.ref(db, ".info/connected"), s => { conn = s.val() === true; });
 const MSG = "⚠️ مش قادر أوصل لقاعدة البيانات. غالباً رابط الداتابيز (databaseURL) في أول الملف غلط — انسخه من Firebase ← Realtime Database ← Data (الرابط اللي فوق).";
 setTimeout(() => { if (!conn && !$("vLoad").hidden) $("le").textContent = MSG; }, 8000);
@@ -159,7 +169,7 @@ const show = id => ["vAuth", "vLoad", "vSub", "vWait", "vDash"].forEach(x => $(x
 // ===== الدخول (Firebase Auth حقيقي — الرقم @strike.app) =====
 U.onAuthStateChanged(auth, u => {
   un.forEach(f => f()); un = []; bu.forEach(f => f()); bu = [];
-  ready = false; sig = ""; paid = 0; sub = null; sts = {}; bks = {};
+  ready = false; sig = ""; paid = 0; sub = null; sts = {}; bks = {}; cxs = {};
   $("hOut").hidden = !u;
   if (!u) { me = null; show("vAuth"); return; }
   show("vLoad"); $("le").textContent = "";
@@ -173,7 +183,7 @@ function loadErr(e) { toast(err(e)); $("le").textContent = "⚠️ " + err(e) + 
 function gate() {
   if (paid > Date.now()) return dash();
   if (sub && sub.status == "pending") return show("vWait");
-  $("sn").textContent = sub && sub.status == "rejected" ? "الطلب السابق اترفض، راجع بيانات التحويل وابعت تاني." : paid ? "اشتراكك انتهى، جدّد عشان ملاعبك ترجع تظهر." : "";
+  $("sn").textContent = sub && sub.status == "rejected" ? "الطلب السابق اترفض، راجع بيانات التحويل وابعت تاني." + (sub.reason ? " السبب: " + sub.reason : "") : paid ? "اشتراكك انتهى، جدّد عشان ملاعبك ترجع تظهر." : "";
   $("bk").hidden = true; show("vSub");
 }
 
@@ -183,7 +193,7 @@ function dash() {
   $("top").innerHTML = `<div><b>أهلاً بيك 👋</b><div class="m">اشتراكك ساري ${n} يوم</div></div>${n <= 5 ? `<button class="btn s a" data-a="renew">جدّد</button>` : ""}`;
   if (ready) return; ready = true;
   $("dt").innerHTML = [...Array(14)].map((_, i) => {
-    const d = new Date(); d.setDate(d.getDate() + i);
+    const d = biz(); d.setDate(d.getDate() + i);
     return `<div class="tab ${i ? "" : "on"}" data-a="day" data-k="${dk(d)}"><b>${i ? (i == 1 ? "بكرة" : DAYS[d.getDay()]) : "النهاردة"}</b><span style="font-size:10px;opacity:.7">${d.getDate()}/${d.getMonth() + 1}</span></div>`;
   }).join("");
   $("nf").innerHTML = fields("x");
@@ -192,9 +202,26 @@ function dash() {
 }
 
 // نسمع حجوزات كل ملعب من النهاردة وطالع
+let cxs = {};
 function subB() {
   bu.forEach(f => f());
-  bu = Object.keys(sts).map(id => D.onValue(D.query(R("bookings/" + id), D.orderByKey(), D.startAt(dk(new Date()))), s => { bks[id] = s.val() || {}; drawB(); }, e => toast(err(e))));
+  bu = Object.keys(sts).flatMap(id => [
+    D.onValue(D.query(R("bookings/" + id), D.orderByKey(), D.startAt(dk(new Date(Date.now() - 30 * 864e5)))), s => { const old = bks[id], nw = s.val() || {}; if (old) Object.entries(nw).forEach(([d, hs]) => Object.entries(hs).forEach(([k, x]) => { if (!(old[d] && old[d][k]) && x.code != "MAN" && x.code != "FIX") toast(`🔔 حجز جديد: ${x.name} — ${x.hour} (${d})`); })); bks[id] = nw; drawB(); sweep(); }, e => toast(err(e))),
+    D.onValue(D.query(R("cancelled/" + id), D.orderByKey(), D.limitToLast(10)), s => { cxs[id] = s.val() || {}; drawX(); }, () => { })
+  ]);
+}
+async function sweep() {
+  const up = {}, now = Date.now() + so; let n = 0;
+  Object.entries(bks).forEach(([id, ds]) => Object.entries(ds).forEach(([d, hs]) => Object.entries(hs).forEach(([k, b]) => { if (b.dpReq > 0 && b.dl < now && !b.dep) { up[`strike_data/slots/${d}/${id}/${k}`] = null; up[`strike_data/bookings/${id}/${d}/${k}`] = null; up[`strike_data/open/${id}_${d}_${k}`] = null; n++; } })));
+  if (n) try { await D.update(D.ref(db), up); toast(`تم تحرير ${n} ميعاد لانتهاء مهلة العربون ⏳`); } catch (e) { toast(err(e)); }
+}
+setInterval(() => { if (!$("vDash").hidden) sweep(); }, 60000);
+function drawX() {
+  const l = [];
+  Object.entries(cxs).forEach(([id, ds]) => Object.entries(ds).forEach(([d, hs]) => Object.entries(hs).forEach(([k, c]) => l.push({ id, d, k, c }))));
+  l.sort((a, b) => b.c.ts - a.c.ts);
+  $("cx").hidden = !l.length;
+  $("cx").innerHTML = `<div style="font-weight:800;margin-bottom:8px">🔔 حجوزات اتلغت من اللاعبين</div>` + l.slice(0, 6).map(x => { const ph = num(x.c.phone || ""); return `<div class="item"><div><b>${esc(x.c.stadium)}</b> — ${esc(x.d)} ${esc(x.c.hour)}<div class="m">👤 ${esc(x.c.name)} ${okPhone(ph) ? "📞 " + ph : ""} ${x.c.dep ? "💵 كان دافع عربون — راجعه" : ""}</div></div><button class="btn s r" data-a="cxd" data-id="${x.id}" data-d="${x.d}" data-k="${x.k}">تمام ✔</button></div>`; }).join("");
 }
 
 // ===== نموذج الملعب (مشترك بين الإضافة والتعديل) =====
@@ -205,26 +232,34 @@ const fields = (p, s = {}) => `
   <div class="fg"><label>المنطقة / العنوان</label><input id="${p}a" value="${esc(s.area || "")}" placeholder="القاهرة - المعادي"></div>
   <div class="row"><div><label>سعر الساعة (ج.م)</label><input id="${p}p" type="number" inputmode="numeric" min="1" value="${s.pricePerHour ?? ""}"></div>
   <div><label>عدد اللاعبين</label><select id="${p}z">${SIZES.map(z => `<option value="${z}"${z == (s.size || 5) ? " selected" : ""}>${z} ضد ${z}</option>`).join("")}</select></div></div>
+  <div class="row"><div><label>🔥 سعر الذروة (اختياري)</label><input id="${p}q" type="number" inputmode="numeric" min="1" value="${s.peakPrice ?? ""}"></div><div><label>الذروة من الساعة</label><select id="${p}k"><option value="">بدون</option>${hopt(s.peakFrom)}</select></div></div>
+  <div class="row"><div><label>💵 عربون (مهلة 30 دقيقة)</label><input id="${p}e" type="number" inputmode="numeric" min="1" value="${s.deposit ?? ""}"></div><div><label>محفظة / إنستاباي للعربون</label><input id="${p}w" type="tel" inputmode="numeric" value="${esc(s.payNo || "")}" placeholder="01xxxxxxxxx"></div></div>
   <div class="fg"><label>لوكيشن Google Maps (اختياري)</label><input id="${p}m" type="url" value="${esc(s.mapUrl || "")}" placeholder="https://maps.google.com/..."></div>
   <div class="row"><div><label>🕒 يفتح</label><select id="${p}o">${hopt(s.openHour ?? 17)}</select></div><div><label>🔒 يقفل</label><select id="${p}c">${hopt(s.closeHour ?? 1)}</select></div></div>
   <label>المميزات</label><div class="chips" id="${p}f" style="margin-bottom:12px">${chips(FAC, arr(s.facilities).map(Number))}</div>
   <label>أيام الإجازة (الملعب مقفول)</label><div class="chips" id="${p}d" style="margin-bottom:14px">${chips(DAYS, arr(s.daysOff).map(Number), "off")}</div>`;
 const picked = id => $$(`#${id} .chip.on`).map(c => +c.dataset.v);
 const read = p => ({ name: $(p + "n").value.trim(), area: $(p + "a").value.trim(), pricePerHour: +$(p + "p").value, size: +$(p + "z").value, mapUrl: $(p + "m").value.trim(),
-  openHour: +$(p + "o").value, closeHour: +$(p + "c").value, facilities: picked(p + "f"), daysOff: picked(p + "d") });
-const bad = v => !v.name || !v.area || !(v.pricePerHour > 0) ? "كمّل الاسم والمنطقة والسعر" : v.openHour == v.closeHour ? "ميعاد الفتح والإقفال لازم يختلفوا" : "";
+  openHour: +$(p + "o").value, closeHour: +$(p + "c").value, peakPrice: +$(p + "q").value || null, peakFrom: $(p + "k").value === "" ? null : +$(p + "k").value, deposit: +$(p + "e").value || null, payNo: num($(p + "w").value) || null, facilities: picked(p + "f"), daysOff: picked(p + "d") });
+const bad = v => !v.name || !v.area || !(v.pricePerHour > 0) ? "كمّل الاسم والمنطقة والسعر" : v.openHour == v.closeHour ? "ميعاد الفتح والإقفال لازم يختلفوا" : (v.peakPrice == null) != (v.peakFrom == null) ? "كمّل سعر الذروة وميعادها أو سيبهم فاضيين" : (v.deposit != null && !okPhone(v.payNo || "")) ? "اكتب رقم محفظة/إنستاباي صحيح للعربون" : "";
 
 function drawS() {
   const g = JSON.stringify(sts); if (g == sig) return; sig = g; // ما نمسحش اللي بيتعدل
   $("pS").innerHTML = Object.entries(sts).map(([id, s]) => `<div class="card">
     <div class="item" style="padding-top:0"><div><b>${esc(s.name)}</b><div class="m">📍 ${esc(s.area)}</div></div>
     <button class="btn s ${s.status == "active" ? "" : "r"}" data-a="tg" data-id="${id}">${s.status == "active" ? "شغال ✅" : "موقف 🚫"}</button></div>
-    ${fields(id, s)}<div class="row"><button class="btn" data-a="sv" data-id="${id}">حفظ 💾</button><button class="btn r" data-a="del" data-id="${id}">حذف 🗑️</button></div></div>`).join("")
+    ${fields(id, s)}<div class="fg"><label>📷 صورة الملعب</label><img id="pv_${id}" alt="" style="display:none;width:100%;max-height:180px;object-fit:cover;border-radius:10px;margin-bottom:8px"><input type="file" accept="image/*" id="pf_${id}"><div class="row" style="margin:8px 0 0"><button class="btn s a" style="width:100%" data-a="ph" data-id="${id}">رفع الصورة ⬆️</button><button class="btn s r" style="width:100%" data-a="phd" data-id="${id}">مسح الصورة</button></div></div><div class="row"><button class="btn" data-a="sv" data-id="${id}">حفظ 💾</button><button class="btn r" data-a="del" data-id="${id}">حذف 🗑️</button></div></div>`).join("")
     || `<div class="empty">لسه مفيش ملاعب. أضف ملعبك الأول من تبويب "إضافة ملعب".</div>`;
+  Object.keys(sts).forEach(id => D.get(R("photos/" + id)).then(x => { const v = x.val(), im = $("pv_" + id); if (v && im) { im.src = v; im.style.display = "block"; } }).catch(() => { }));
 }
 
 // ===== الحجوزات =====
 function drawB() {
+  const ab = {}, today = dk(biz()); let m30 = 0;
+  Object.values(bks).forEach(x => Object.entries(x).forEach(([k, day]) => Object.values(day).forEach(b => { if (b.att == "no") ab[b.phone] = (ab[b.phone] || 0) + 1; else if (k <= today) m30 += +b.price || 0; })));
+  const rv = []; for (let i = 6; i >= 0; i--) { const d = biz(); d.setDate(d.getDate() - i); const k = dk(d); let t = 0; Object.values(bks).forEach(x => Object.values(x[k] || {}).forEach(b => { if (b.att != "no") t += +b.price || 0; })); rv.push([DAYS[d.getDay()], t]); }
+  const mx = Math.max(1, ...rv.map(r => r[1]));
+  $("rev").innerHTML = `<div style="font-weight:800;margin-bottom:8px">💰 الإيراد — آخر 7 أيام: <span style="color:var(--g)">${rv.reduce((a, r) => a + r[1], 0)}</span> ج.م • آخر 30 يوم: ${m30} ج.م</div><div style="display:flex;gap:6px;align-items:flex-end;height:96px">${rv.map(([n, t]) => `<div style="flex:1;text-align:center"><div style="background:var(--g);border-radius:6px 6px 0 0;height:${Math.round(t / mx * 56)}px;min-height:2px"></div><div class="m" style="font-size:10px">${n}</div><div class="m" style="font-size:10px">${t}</div></div>`).join("")}</div>`;
   const rows = [], dow = new Date(sel + "T00:00:00").getDay();
   let free = 0;
   Object.entries(sts).forEach(([id, s]) => {
@@ -233,12 +268,12 @@ function drawB() {
     if (s.status == "active" && !arr(s.daysOff).map(Number).includes(dow)) free += Math.max(0, hours(s).length - Object.keys(day).length);
   });
   rows.sort((a, b) => a.h - b.h);
-  $("sum").innerHTML = `<div><b>${rows.length}</b><span class="m">حجز</span></div><div><b>${rows.reduce((t, r) => t + (+r.b.price || 0), 0)}</b><span class="m">ج.م إيراد</span></div><div><b>${free}</b><span class="m">ساعة فاضية</span></div>`;
+  $("sum").innerHTML = `<div><b>${rows.length}</b><span class="m">حجز</span></div><div><b>${rows.reduce((t, r) => t + (r.b.att == "no" ? 0 : +r.b.price || 0), 0)}</b><span class="m">ج.م إيراد</span></div><div><b>${free}</b><span class="m">ساعة فاضية</span></div>`;
   $("bl").innerHTML = rows.map(r => { const ph = num(r.b.phone || ""), ok = okPhone(ph); return `<div class="item"><div>
     <div style="color:var(--g);font-weight:900">⏰ ${fmt(r.h)} — ${esc(sts[r.id].name)}</div>
-    <div style="font-weight:800">👤 ${esc(r.b.name)}</div><div class="m">${ok ? "📞 " + ph : ""} ${esc(r.b.ready || "")}</div></div>
+    <div style="font-weight:800">👤 ${esc(r.b.name)} ${r.b.att == "ok" ? "✅" : r.b.att == "no" ? "🚫" : ""}</div><div class="m">${ok ? "📞 " + ph : ""} ${esc(r.b.ready || "")} ${r.b.dpReq > 0 && !r.b.dep && r.b.dl ? "⏳ مهلة العربون لحد " + new Date(r.b.dl).toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" }) : ""} ${r.b.dep ? (r.b.dep.ok ? "💵 العربون مؤكد ✅" : "💵 عربون بانتظار التأكيد #" + esc(r.b.dep.trx) + (r.b.dep.img ? ` <a style="color:var(--g)" target="_blank" rel="noopener" href="${esc(r.b.dep.img)}">📎 الإيصال</a>` : "")) : ""} ${ab[r.b.phone] ? "⚠️ غاب " + ab[r.b.phone] + " مرة" : ""}</div></div>
     <div style="display:flex;flex-direction:column;gap:6px">${ok ? `<a class="btn s w" target="_blank" rel="noopener" href="${wa(ph)}">واتساب</a><a class="btn s a" href="tel:${ph}">اتصال</a>` : ""}
-    <button class="btn s r" data-a="cancel" data-id="${r.id}" data-k="${r.k}">إلغاء ❌</button></div></div>`; }).join("") || `<div class="empty">مفيش حجوزات في اليوم ده.</div>`;
+    ${r.b.dep && !r.b.dep.ok ? `<button class="btn s" data-a="dok" data-id="${r.id}" data-k="${r.k}">تأكيد العربون 💵</button>` : ""}<div style="display:flex;gap:6px"><button class="btn s ${r.b.att == "ok" ? "" : "a"}" data-a="att" data-id="${r.id}" data-k="${r.k}" data-v="ok">حضر</button><button class="btn s ${r.b.att == "no" ? "r" : "a"}" data-a="att" data-id="${r.id}" data-k="${r.k}" data-v="no">غاب</button></div><button class="btn s r" data-a="cancel" data-id="${r.id}" data-k="${r.k}">إلغاء ❌</button></div></div>`; }).join("") || `<div class="empty">مفيش حجوزات في اليوم ده.</div>`;
   fillManual();
 }
 function fillManual() {
@@ -283,16 +318,39 @@ const H = {
   man: async (_, b) => {
     const id = $("ms").value, h = $("mh").value;
     if (!id || h === "") return toast("اختار ملعب وميعاد فاضي");
-    const p = num($("mp").value);
+    const p = num($("mp").value), n = +$("mr").value || 1, s = sts[id];
+    b.disabled = true; let ok = 0, skip = 0;
+    try {
+      for (let i = 0; i < n; i++) {
+        const d = new Date(sel + "T00:00:00"); d.setDate(d.getDate() + 7 * i); const k = dk(d);
+        if (((bks[id] || {})[k] || {})["h" + h] || arr(s.daysOff).map(Number).includes(d.getDay())) { skip++; continue; }
+        try { await put(id, k, h, { name: $("mn").value.trim().slice(0, 40) || (n > 1 ? "حجز ثابت" : "حجز يدوي"), phone: okPhone(p) ? p : "-", ready: n > 1 ? "حجز ثابت أسبوعي" : "حجز يدوي", code: n > 1 ? "FIX" : "MAN", hour: fmt(+h), price: priceAt(s, +h), ts: Date.now() }); ok++; } catch { skip++; }
+      }
+      $("mn").value = ""; $("mp").value = ""; $("mr").value = "1";
+      toast(`تم تسجيل ${ok} حجز ✅` + (skip ? ` • اتخطّى ${skip} (محجوز/إجازة)` : ""));
+    } finally { b.disabled = false; }
+  },
+  att: async d => { const cur = (((bks[d.id] || {})[sel] || {})[d.k] || {}).att; try { await D.set(R(`bookings/${d.id}/${sel}/${d.k}/att`), cur == d.v ? null : d.v); } catch (e) { toast(err(e)); } },
+  dok: async d => {
+    const up = {}, tgt = (((bks[d.id] || {})[sel] || {})[d.k]) || {};
+    Object.entries(bks[d.id] || {}).forEach(([dt, hs]) => Object.entries(hs).forEach(([k, b]) => { if (b.dep && !b.dep.ok && ((dt == sel && k == d.k) || (tgt.sr && b.sr == tgt.sr))) { up[`strike_data/bookings/${d.id}/${dt}/${k}/dep/ok`] = true; up[`strike_data/slots/${dt}/${d.id}/${k}`] = true; if (b.ckey) up[`strike_data/depStatus/${b.ckey}`] = true; } }));
+    try { await D.update(D.ref(db), up); toast("تم تأكيد العربون ✅"); } catch (e) { toast(err(e)); }
+  },
+  cxd: async d => { try { await D.remove(R(`cancelled/${d.id}/${d.d}/${d.k}`)); } catch (e) { toast(err(e)); } },
+  ph: async (d, b) => {
+    const f = $("pf_" + d.id).files[0]; if (!f) return toast("اختار صورة الأول");
     b.disabled = true;
     try {
-      await put(id, sel, h, { name: $("mn").value.trim().slice(0, 40) || "حجز يدوي", phone: okPhone(p) ? p : "-", ready: "حجز يدوي", code: "MAN", hour: fmt(+h), price: Number(sts[id].pricePerHour) || 0, ts: Date.now() });
-      $("mn").value = ""; $("mp").value = ""; toast("تم تسجيل الحجز ✅");
+      let url = "";
+      try { url = await freeUp(await shrink(f, 1280, .75, 1.5e6)); }
+      catch { url = await shrink(f, 720, .7, 120000); if (url.length > 140000) throw new Error("الصورة كبيرة، جرّب صورة تانية"); }
+      await D.set(R("photos/" + d.id), url); const im = $("pv_" + d.id); im.src = url; im.style.display = "block"; toast("تم رفع الصورة ✅");
     } catch (e) { toast(err(e)); } finally { b.disabled = false; }
   },
+  phd: async d => { try { await D.remove(R("photos/" + d.id)); $("pv_" + d.id).style.display = "none"; toast("تم مسح الصورة"); } catch (e) { toast(err(e)); } },
   cancel: async d => {
     if (!confirm("تأكيد إلغاء الحجز ده؟")) return;
-    try { await D.update(D.ref(db), { [`strike_data/slots/${sel}/${d.id}/${d.k}`]: null, [`strike_data/bookings/${d.id}/${sel}/${d.k}`]: null }); toast("تم إلغاء الحجز"); }
+    try { await D.update(D.ref(db), { [`strike_data/slots/${sel}/${d.id}/${d.k}`]: null, [`strike_data/bookings/${d.id}/${sel}/${d.k}`]: null, [`strike_data/open/${d.id}_${sel}_${d.k}`]: null }); toast("تم إلغاء الحجز"); }
     catch (e) { toast(err(e)); }
   },
   tg: async d => { try { await D.set(R(`stadiums/${d.id}/status`), sts[d.id].status == "active" ? "inactive" : "active"); } catch (e) { toast(err(e)); } },
@@ -302,7 +360,7 @@ const H = {
   },
   del: async d => {
     if (!confirm("تأكيد حذف الملعب نهائياً؟")) return;
-    try { await D.remove(R("stadiums/" + d.id)); toast("تم حذف الملعب"); } catch (e) { toast(err(e)); }
+    try { await D.update(D.ref(db), { [`strike_data/stadiums/${d.id}`]: null, [`strike_data/photos/${d.id}`]: null }); toast("تم حذف الملعب"); } catch (e) { toast(err(e)); }
   },
   add: async (_, b) => {
     const v = read("x"), m = bad(v); if (m) return toast(m);
