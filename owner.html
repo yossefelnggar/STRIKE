@@ -219,7 +219,8 @@ setTimeout(() => { if (!conn && !$("vLoad").hidden) $("le").textContent = MSG; }
 const show = id => ["vAuth", "vLoad", "vSub", "vWait", "vDash"].forEach(x => $(x).hidden = x != id);
 
 // ===== الدخول (Firebase Auth حقيقي — الرقم @strike.app) =====
-U.onAuthStateChanged(auth, u => {
+const hOut = $("hOut");
+if (hOut) hOut.hidden = !u;
   un.forEach(f => f()); un = []; bu.forEach(f => f()); bu = [];
   ready = false; sig = ""; paid = 0; sub = null; sts = {}; bks = {}; cxs = {};
   $("hOut").hidden = !u;
