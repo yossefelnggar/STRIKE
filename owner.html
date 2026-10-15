@@ -58,6 +58,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:8px;bac
   }
 } 
 .pill{background:var(--gg);color:var(--g);border:1px solid rgba(34,197,94,.3);padding:6px 14px;border-radius:20px;font-size:13px;font-weight:700;text-decoration:none;cursor:pointer}
+.pill.out{background:var(--rb);color:var(--r);border-color:rgba(239,68,68,.3)}
 .card{background:var(--card);border:1px solid var(--b);border-radius:16px;padding:18px;margin-bottom:14px}
 .m{color:var(--m);font-size:12px;font-weight:600}
 .fg{margin-bottom:12px}
@@ -103,7 +104,7 @@ input:focus,select:focus{border-color:var(--g)}
   </a>
 
   <div class="nav-actions">
-    <span class="pill" data-a="my">🎟️ حجوزاتي</span>
+    <span class="pill out" id="outBtn" data-a="out" hidden>🚪 تسجيل خروج</span>
     <a class="pill" href="owner.html">صاحب ملعب؟</a>
   </div>
 </header>
@@ -233,6 +234,9 @@ U.onAuthStateChanged(auth, u => {
   sts = {};
   bks = {};
   cxs = {};
+
+  // زر تسجيل الخروج يظهر بس لما يكون فيه مستخدم داخل
+  $("outBtn").hidden = !u;
 
   if (!u) {
     me = null;
