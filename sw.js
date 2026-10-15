@@ -1,0 +1,25 @@
+const CACHE_NAME = "strike-pwa-v1";
+
+self.addEventListener("install", () => {
+  self.skipWaiting();
+});
+
+self.addEventListener("activate", event => {
+  event.waitUntil(
+    (async () => {
+      await self.clients.claim();
+    })()
+  );
+});
+
+self.addEventListener("fetch", event => {
+  if (event.request.method !== "GET") return;
+
+  const url = new URL(event.request.url);
+
+  if (url.origin !== self.location.origin) return;
+
+  event.respondWith(
+    fetch(event.request).catch(() => caches.match(event.request))
+  );
+});
