@@ -148,9 +148,59 @@ input:focus,select:focus{border-color:var(--g)}
   background: #252b38;
   color: #f1f5f9;
 }
+/* Install helpers */
+.pill.inst{background:#22c55e;color:#07110a;border-color:#22c55e;font-family:inherit}
+.install-steps{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.75);display:flex;align-items:flex-end;justify-content:center}
+.install-steps-box{background:#161b26;border:1px solid rgba(255,255,255,.08);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:22px;line-height:2}
+.install-steps-box h3{font-size:17px;font-weight:900;margin-bottom:8px}
+.install-steps-box ol{padding-inline-start:20px;font-size:14px;font-weight:700}
+.install-steps-box button{width:100%;margin-top:14px;border:0;border-radius:10px;padding:12px;background:#22c55e;color:#07110a;font-family:inherit;font-weight:800;font-size:14px;cursor:pointer}
+/* Responsive fixes */
+html,body{max-width:100%;overflow-x:hidden}
+header{flex-wrap:wrap}
+.logo{min-width:0;flex-shrink:1}
+.nav-actions{flex-wrap:wrap;justify-content:flex-end;min-width:0;flex-shrink:1}
+.pill{white-space:nowrap}
+@media(max-width:420px){.pill{padding:6px 10px;font-size:12px}}
+.install-banner{padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
 </style>
 
-<link rel="manifest" href="manifest.json"><link rel="icon" href="https://i.ibb.co/xtbTJb4T/file-0000000034e0821092950d67e581aa6b.png"><link rel="apple-touch-icon" href="https://i.ibb.co/xtbTJb4T/file-0000000034e0821092950d67e581aa6b.png">
+<script>
+window.__bip = null;
+addEventListener("beforeinstallprompt", e => { e.preventDefault(); window.__bip = e; dispatchEvent(new Event("strike-bip")); });
+(function () {
+  var LOGO = "https://i.ibb.co/xtbTJb4T/file-0000000034e0821092950d67e581aa6b.png";
+  function addMan(href) { var l = document.createElement("link"); l.rel = "manifest"; l.href = href; document.head.appendChild(l); }
+  var img = new Image(); img.crossOrigin = "anonymous";
+  img.onload = function () {
+    try {
+      var mk = function (n) {
+        var c = document.createElement("canvas"); c.width = c.height = n;
+        var x = c.getContext("2d"); x.fillStyle = "#0b0d12"; x.fillRect(0, 0, n, n);
+        var m = n * 0.62, z = Math.min(m / img.width, m / img.height), w = img.width * z, h = img.height * z;
+        x.drawImage(img, (n - w) / 2, (n - h) / 2, w, h);
+        return c.toDataURL("image/png");
+      };
+      var base = location.href.replace(/[?#].*$/, "").replace(/[^\/]*$/, "");
+      var i192 = mk(192), i512 = mk(512);
+      var man = {
+        id: base, name: "STRIKE - احجز الماتش", short_name: "STRIKE", description: "احجز ملعبك واعثر على ماتشك مع STRIKE",
+        lang: "ar", dir: "rtl", start_url: base + "index.html", scope: base, display: "standalone",
+        background_color: "#0b0d12", theme_color: "#0b0d12",
+        icons: [
+          { src: i192, sizes: "192x192", type: "image/png", purpose: "any" },
+          { src: i512, sizes: "512x512", type: "image/png", purpose: "any" },
+          { src: i512, sizes: "512x512", type: "image/png", purpose: "maskable" }
+        ]
+      };
+      addMan(URL.createObjectURL(new Blob([JSON.stringify(man)], { type: "application/manifest+json" })));
+      var ap = document.querySelector('link[rel="apple-touch-icon"]'); if (ap) ap.href = mk(180);
+    } catch (e) { addMan("manifest.json"); }
+  };
+  img.onerror = function () { addMan("manifest.json"); };
+  img.src = LOGO;
+})();
+</script><link rel="icon" href="https://i.ibb.co/xtbTJb4T/file-0000000034e0821092950d67e581aa6b.png"><link rel="apple-touch-icon" href="https://i.ibb.co/xtbTJb4T/file-0000000034e0821092950d67e581aa6b.png">
 </head>
 <body>
 <div class="wrap">
@@ -162,6 +212,7 @@ input:focus,select:focus{border-color:var(--g)}
     >
   </a>
   <div class="nav-actions">
+    <span class="pill inst" id="installPill" hidden>📲 تنزيل</span>
     <span class="pill" data-a="my">🎟️ حجوزاتي</span>
     <a class="pill" href="owner.html">صاحب ملعب؟</a>
   </div>
@@ -187,7 +238,7 @@ input:focus,select:focus{border-color:var(--g)}
       alt="STRIKE"
     >
     <div class="install-banner-content">
-      <div class="install-banner-title">ثبّت STRIKE على موبايلك ⚽</div>
+      <div class="install-banner-title">نزّل تطبيق STRIKE ⚽</div>
       <div class="install-banner-desc">
         ادخل على الملاعب واحجز ماتشك بسهولة من الشاشة الرئيسية.
       </div>
@@ -196,7 +247,7 @@ input:focus,select:focus{border-color:var(--g)}
 
   <div class="install-banner-buttons">
     <button class="install-main" id="installStrikeBtn">
-      📲 تثبيت STRIKE
+      📲 تنزيل التطبيق
     </button>
     <button class="install-close" id="closeInstallBtn">
       لاحقًا
@@ -446,76 +497,69 @@ document.addEventListener("click", e => { const b = e.target.closest("[data-a]")
   const banner = document.getElementById("installBanner");
   const installBtn = document.getElementById("installStrikeBtn");
   const closeBtn = document.getElementById("closeInstallBtn");
-
+  const pill = document.getElementById("installPill");
   if (!banner || !installBtn || !closeBtn) return;
 
-  let installPrompt = null;
-  let isInstalled = false;
-
+  let deferred = window.__bip || null;
+  let installed = false;
   try {
-    isInstalled =
-      window.matchMedia("(display-mode: standalone)").matches ||
-      window.navigator.standalone === true;
+    installed = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
   } catch (_) {}
+  if (installed) return;
 
-  if (isInstalled) return;
-
+  const KEY = "strikeInstallDismissedAt";
   const dismissed = () => {
-    try {
-      return sessionStorage.getItem("strikeInstallDismissed") === "1";
-    } catch (_) {
-      return false;
-    }
+    try { return Date.now() - (+localStorage.getItem(KEY) || 0) < 864e5; } catch (_) { return false; }
+  };
+  const showBanner = () => { if (!installed && !dismissed()) banner.hidden = false; };
+  pill && (pill.hidden = false);
+
+  const steps = () => {
+    const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const list = ios
+      ? "<li>اضغط زر المشاركة ⬆️ في Safari</li><li>اختار «إضافة إلى الشاشة الرئيسية»</li><li>اضغط «إضافة»</li>"
+      : "<li>افتح قائمة المتصفح ⋮</li><li>اختار «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية»</li><li>اضغط «تثبيت»</li>";
+    const w = document.createElement("div");
+    w.className = "install-steps";
+    w.innerHTML = '<div class="install-steps-box"><h3>📲 نزّل STRIKE في 3 خطوات</h3><ol>' + list + '</ol><button type="button">تمام</button></div>';
+    w.addEventListener("click", e => { if (e.target === w || e.target.tagName === "BUTTON") w.remove(); });
+    document.body.appendChild(w);
   };
 
-  const showBanner = () => {
-    if (!isInstalled && !dismissed()) {
-      banner.hidden = false;
+  const install = async () => {
+    if (deferred) {
+      deferred.prompt();
+      try {
+        const r = await deferred.userChoice;
+        if (r.outcome === "accepted") banner.hidden = true;
+      } catch (_) {}
+      deferred = null;
+      return;
     }
+    banner.hidden = true;
+    steps();
   };
 
-  window.addEventListener("beforeinstallprompt", event => {
-    event.preventDefault();
-    installPrompt = event;
-    installBtn.textContent = "📲 تثبيت STRIKE";
+  addEventListener("strike-bip", () => {
+    deferred = window.__bip;
     showBanner();
   });
 
-  window.addEventListener("appinstalled", () => {
-    isInstalled = true;
+  addEventListener("appinstalled", () => {
+    installed = true;
+    deferred = null;
     banner.hidden = true;
-    installPrompt = null;
+    pill && (pill.hidden = true);
   });
 
-  installBtn.addEventListener("click", async () => {
-    if (installPrompt) {
-      installPrompt.prompt();
-      const result = await installPrompt.userChoice;
-      installPrompt = null;
-
-      if (result.outcome === "accepted") {
-        banner.hidden = true;
-      }
-      return;
-    }
-
-    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-
-    alert(
-      isIOS
-        ? 'لتثبيت STRIKE: اضغط مشاركة في المتصفح، ثم "إضافة إلى الشاشة الرئيسية".'
-        : 'لو بتستخدم Chrome: افتح قائمة ⋮ وابحث عن "تثبيت التطبيق" أو "إضافة إلى الشاشة الرئيسية".'
-    );
-  });
-
+  installBtn.addEventListener("click", install);
+  pill && pill.addEventListener("click", install);
   closeBtn.addEventListener("click", () => {
     banner.hidden = true;
-    try {
-      sessionStorage.setItem("strikeInstallDismissed", "1");
-    } catch (_) {}
+    try { localStorage.setItem(KEY, String(Date.now())); } catch (_) {}
   });
 
-  setTimeout(showBanner, 1500);
+  showBanner();
 })();
 </script>
 
