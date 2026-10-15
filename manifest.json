@@ -11,7 +11,7 @@
   "background_color": "#0b0d12",
   "theme_color": "#0b0d12",
   "icons": [
-    { "src": "https://i.ibb.co/xtbTJb4T/file-0000000034e0821092950d67e581aa6b.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "https://i.ibb.co/xtbTJb4T/file-0000000034e0821092950d67e581aa6b.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+    { "src": "https://i.ibb.co/6J4ZhPHR/file-00000000672c82469d4124051aa94617.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "https://i.ibb.co/6J4ZhPHR/file-00000000672c82469d4124051aa94617.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
   ]
 }
