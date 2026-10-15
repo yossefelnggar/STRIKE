@@ -219,17 +219,58 @@ setTimeout(() => { if (!conn && !$("vLoad").hidden) $("le").textContent = MSG; }
 const show = id => ["vAuth", "vLoad", "vSub", "vWait", "vDash"].forEach(x => $(x).hidden = x != id);
 
 // ===== الدخول (Firebase Auth حقيقي — الرقم @strike.app) =====
-const hOut = $("hOut");
-if (hOut) hOut.hidden = !u;
-  un.forEach(f => f()); un = []; bu.forEach(f => f()); bu = [];
-  ready = false; sig = ""; paid = 0; sub = null; sts = {}; bks = {}; cxs = {};
-  $("hOut").hidden = !u;
-  if (!u) { me = null; show("vAuth"); return; }
-  show("vLoad"); $("le").textContent = "";
-  me = { uid: u.uid, phone: (u.email || "").split("@")[0] };
-  un.push(D.onValue(R("paid/" + u.uid), s => { paid = s.val() || 0; gate(); }, loadErr));
-  un.push(D.onValue(R("subscriptions/" + u.uid), s => { sub = s.val(); gate(); }, loadErr));
+
+U.onAuthStateChanged(auth, u => {
+  un.forEach(f => f());
+  un = [];
+  bu.forEach(f => f());
+  bu = [];
+
+  ready = false;
+  sig = "";
+  paid = 0;
+  sub = null;
+  sts = {};
+  bks = {};
+  cxs = {};
+
+  if (!u) {
+    me = null;
+    show("vAuth");
+    return;
+  }
+
+  show("vLoad");
+  $("le").textContent = "";
+
+  me = {
+    uid: u.uid,
+    phone: (u.email || "").split("@")[0]
+  };
+
+  un.push(
+    D.onValue(
+      R("paid/" + u.uid),
+      s => {
+        paid = s.val() || 0;
+        gate();
+      },
+      loadErr
+    )
+  );
+
+  un.push(
+    D.onValue(
+      R("subscriptions/" + u.uid),
+      s => {
+        sub = s.val();
+        gate();
+      },
+      loadErr
+    )
+  );
 });
+
 
 function loadErr(e) { toast(err(e)); $("le").textContent = "⚠️ " + err(e) + " [" + (e.code || e.message) + "]"; if (!$("vLoad").hidden) return; }
 
