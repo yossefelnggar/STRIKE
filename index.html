@@ -86,6 +86,71 @@ input:focus,select:focus{border-color:var(--g)}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .2s}.modal.open{opacity:1;pointer-events:auto}
 .box{background:#161b26;border:1px solid var(--b);border-radius:24px 24px 0 0;width:100%;max-width:640px;max-height:88vh;overflow:auto;padding:22px}
 .toast{position:fixed;top:20px;left:50%;transform:translate(-50%,-80px);background:var(--card);border:1px solid var(--b);color:#fff;padding:10px 20px;border-radius:30px;font-weight:700;font-size:13px;box-shadow:0 10px 25px rgba(0,0,0,.5);z-index:200;opacity:0;transition:.3s;max-width:92vw}.toast.show{transform:translate(-50%,0);opacity:1}
+
+/* STRIKE Install Banner */
+.install-banner {
+  position: fixed;
+  bottom: 16px;
+  left: 12px;
+  right: 12px;
+  max-width: 500px;
+  margin: auto;
+  z-index: 999;
+  padding: 16px;
+  border: 1px solid rgba(34,197,94,.45);
+  border-radius: 18px;
+  background: #131722;
+  box-shadow: 0 12px 40px rgba(0,0,0,.55);
+}
+.install-banner-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.install-banner-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.install-banner-content {
+  flex: 1;
+  min-width: 0;
+}
+.install-banner-title {
+  font-size: 15px;
+  font-weight: 900;
+  margin-bottom: 3px;
+}
+.install-banner-desc {
+  font-size: 11px;
+  color: #94a3b8;
+  line-height: 1.7;
+}
+.install-banner-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.install-banner-buttons button {
+  flex: 1;
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 8px;
+  font-family: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+.install-main {
+  background: #22c55e;
+  color: #07110a;
+}
+.install-close {
+  background: #252b38;
+  color: #f1f5f9;
+}
+
+  
 </style>
 <link rel="manifest" href="manifest.json"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
 </head>
