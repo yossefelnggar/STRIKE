@@ -13,7 +13,50 @@
 body{background:var(--bg);color:var(--t);min-height:100vh;padding-bottom:40px;font-size:14px}
 .wrap{width:min(640px,100% - 24px);margin:0 auto;padding-top:16px}
 header{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--card);border:1px solid var(--b);border-radius:16px;padding:12px 18px;margin-bottom:16px}
-.logo{font-size:22px;font-weight:900;color:#fff;text-decoration:none}.logo span{color:var(--g)}
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-shrink: 0;
+  text-decoration: none;
+  line-height: 0;
+}
+
+.logo img {
+  display: block;
+  width: auto;
+  height: 44px;
+  max-width: 120px;
+  object-fit: contain;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 380px) {
+  header {
+    padding: 10px;
+    gap: 6px;
+  }
+
+  .logo img {
+    height: 36px;
+    max-width: 90px;
+  }
+
+  .nav-actions {
+    gap: 4px;
+  }
+
+  .pill {
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+} 
 .pill{background:var(--gg);color:var(--g);border:1px solid rgba(34,197,94,.3);padding:6px 14px;border-radius:20px;font-size:13px;font-weight:700;text-decoration:none;cursor:pointer}
 .card{background:var(--card);border:1px solid var(--b);border-radius:16px;padding:18px;margin-bottom:14px}
 .m{color:var(--m);font-size:12px;font-weight:600}
@@ -51,10 +94,19 @@ input:focus,select:focus{border-color:var(--g)}
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <a class="logo" href="index.html">STRIKE<span>.</span></a>
-    <div style="display:flex;gap:6px"><span class="pill" id="hOut" data-a="out" hidden>خروج</span><a class="pill" href="index.html">الرئيسية ⚽</a></div>
-  </header>
+<header>
+  <a class="logo" href="index.html" aria-label="STRIKE - الصفحة الرئيسية">
+    <img
+      src="https://i.ibb.co/xtbTJb4T/file-0000000034e0821092950d67e581aa6b.png"
+      alt="STRIKE Logo"
+    >
+  </a>
+
+  <div class="nav-actions">
+    <span class="pill" data-a="my">🎟️ حجوزاتي</span>
+    <a class="pill" href="owner.html">صاحب ملعب؟</a>
+  </div>
+</header>
 
   <div class="card" id="vAuth">
     <h2 id="aT" style="font-size:18px;font-weight:800;margin-bottom:6px">دخول صاحب الملعب 🔐</h2>
