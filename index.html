@@ -21,7 +21,6 @@ header{display:flex;align-items:center;justify-content:space-between;gap:8px;bac
   text-decoration: none;
   line-height: 0;
 }
-
 .logo img {
   display: block;
   width: auto;
@@ -56,7 +55,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:8px;bac
     padding: 6px 8px;
     font-size: 11px;
   }
-} 
+}
 .pill{background:var(--gg);color:var(--g);border:1px solid rgba(34,197,94,.3);padding:6px 14px;border-radius:20px;font-size:13px;font-weight:700;text-decoration:none;cursor:pointer}
 .card{background:var(--card);border:1px solid var(--b);border-radius:16px;padding:18px;margin-bottom:14px}
 .m{color:var(--m);font-size:12px;font-weight:600}
@@ -149,9 +148,8 @@ input:focus,select:focus{border-color:var(--g)}
   background: #252b38;
   color: #f1f5f9;
 }
-
-  
 </style>
+
 <link rel="manifest" href="manifest.json"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body>
@@ -163,7 +161,6 @@ input:focus,select:focus{border-color:var(--g)}
       alt="STRIKE Logo"
     >
   </a>
-
   <div class="nav-actions">
     <span class="pill" data-a="my">🎟️ حجوزاتي</span>
     <a class="pill" href="owner.html">صاحب ملعب؟</a>
@@ -181,6 +178,31 @@ input:focus,select:focus{border-color:var(--g)}
 </div>
 <div class="modal" id="md"><div class="box" id="mb"></div></div>
 <div class="toast" id="toast"></div>
+
+<div class="install-banner" id="installBanner" hidden>
+  <div class="install-banner-row">
+    <img
+      class="install-banner-logo"
+      src="icon-192.png"
+      alt="STRIKE"
+    >
+    <div class="install-banner-content">
+      <div class="install-banner-title">ثبّت STRIKE على موبايلك ⚽</div>
+      <div class="install-banner-desc">
+        ادخل على الملاعب واحجز ماتشك بسهولة من الشاشة الرئيسية.
+      </div>
+    </div>
+  </div>
+
+  <div class="install-banner-buttons">
+    <button class="install-main" id="installStrikeBtn">
+      📲 تثبيت STRIKE
+    </button>
+    <button class="install-close" id="closeInstallBtn">
+      لاحقًا
+    </button>
+  </div>
+</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
@@ -418,6 +440,85 @@ const H = {
 };
 document.addEventListener("click", e => { const b = e.target.closest("[data-a]"); if (b && H[b.dataset.a]) H[b.dataset.a](b.dataset, b); });
 </script>
+
+<script>
+(() => {
+  const banner = document.getElementById("installBanner");
+  const installBtn = document.getElementById("installStrikeBtn");
+  const closeBtn = document.getElementById("closeInstallBtn");
+
+  if (!banner || !installBtn || !closeBtn) return;
+
+  let installPrompt = null;
+  let isInstalled = false;
+
+  try {
+    isInstalled =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      window.navigator.standalone === true;
+  } catch (_) {}
+
+  if (isInstalled) return;
+
+  const dismissed = () => {
+    try {
+      return sessionStorage.getItem("strikeInstallDismissed") === "1";
+    } catch (_) {
+      return false;
+    }
+  };
+
+  const showBanner = () => {
+    if (!isInstalled && !dismissed()) {
+      banner.hidden = false;
+    }
+  };
+
+  window.addEventListener("beforeinstallprompt", event => {
+    event.preventDefault();
+    installPrompt = event;
+    installBtn.textContent = "📲 تثبيت STRIKE";
+    showBanner();
+  });
+
+  window.addEventListener("appinstalled", () => {
+    isInstalled = true;
+    banner.hidden = true;
+    installPrompt = null;
+  });
+
+  installBtn.addEventListener("click", async () => {
+    if (installPrompt) {
+      installPrompt.prompt();
+      const result = await installPrompt.userChoice;
+      installPrompt = null;
+
+      if (result.outcome === "accepted") {
+        banner.hidden = true;
+      }
+      return;
+    }
+
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+
+    alert(
+      isIOS
+        ? 'لتثبيت STRIKE: اضغط مشاركة في المتصفح، ثم "إضافة إلى الشاشة الرئيسية".'
+        : 'لو بتستخدم Chrome: افتح قائمة ⋮ وابحث عن "تثبيت التطبيق" أو "إضافة إلى الشاشة الرئيسية".'
+    );
+  });
+
+  closeBtn.addEventListener("click", () => {
+    banner.hidden = true;
+    try {
+      sessionStorage.setItem("strikeInstallDismissed", "1");
+    } catch (_) {}
+  });
+
+  setTimeout(showBanner, 1500);
+})();
+</script>
+
 <script>if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => { }))</script>
 </body>
 </html>
