@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b0d12">
+<title>STRIKE — احجز الماتش في ثواني</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="icon" href="https://i.ibb.co/xtbTJb4T/file-0000000034e0821092950d67e581aa6b.png">
+<style>
+:root{--bg:#0b0d12;--card:#131722;--card2:#181e2c;--b:rgba(255,255,255,.07);--t:#f1f5f9;--m:#94a3b8;--g:#22c55e;--gg:rgba(34,197,94,.15);--r:#ef4444;--rb:rgba(239,68,68,.12);--a:#f59e0b;--rad:18px;--sh:0 8px 24px rgba(0,0,0,.35)}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Cairo,sans-serif;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{max-width:100%;overflow-x:hidden}
+body{background:radial-gradient(900px 380px at 50% -120px,rgba(34,197,94,.10),transparent 70%),var(--bg);background-attachment:fixed;color:var(--t);min-height:100vh;padding-bottom:48px;font-size:14px;line-height:1.6}
+.wrap{width:min(640px,100% - 24px);margin:0 auto;padding-top:12px}
+header{position:sticky;top:8px;z-index:50;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;background:rgba(19,23,34,.78);backdrop-filter:blur(14px);border:1px solid var(--b);border-radius:20px;padding:8px 14px;margin-bottom:16px;box-shadow:var(--sh)}
+.logo img{display:block;height:40px;max-width:120px;object-fit:contain}
+.nav{display:flex;gap:6px;flex-wrap:wrap}
+.pill{background:transparent;color:var(--t);border:1px solid var(--b);padding:7px 14px;border-radius:999px;font-size:12.5px;font-weight:700;text-decoration:none;cursor:pointer;white-space:nowrap;transition:.2s}
+.pill:first-child{background:var(--gg);color:var(--g);border-color:rgba(34,197,94,.3)}
+.pill:hover{border-color:var(--g)}
+.card{background:var(--card);border:1px solid var(--b);border-radius:var(--rad);padding:18px;margin-bottom:14px;box-shadow:var(--sh)}
+.hero{position:relative;overflow:hidden;background:linear-gradient(135deg,#141b2b,#1a2a24)!important;border-color:rgba(34,197,94,.25)}
+.hero::after{content:"";position:absolute;inset-inline-start:-40px;top:-40px;width:140px;height:140px;border-radius:50%;border:2px solid rgba(34,197,94,.15);box-shadow:0 0 0 22px rgba(34,197,94,.05)}
+.hero>*{position:relative;z-index:1}
+.m{color:var(--m);font-size:12px;font-weight:600}
+.fg{margin-bottom:14px}
+label{display:block;font-size:12px;font-weight:700;color:var(--m);margin-bottom:6px}
+input,select{width:100%;background:var(--card2);border:1.5px solid var(--b);border-radius:14px;padding:13px 14px;color:var(--t);font-size:14px;outline:0;font-weight:600;transition:.2s}
+input:focus,select:focus{border-color:var(--g);box-shadow:0 0 0 4px var(--gg)}
+.btn{width:100%;background:linear-gradient(180deg,#2bd46a,#1fb757);color:#04130a;font-weight:800;border:0;border-radius:14px;padding:13px;font-size:14px;cursor:pointer;text-align:center;text-decoration:none;display:block;box-shadow:0 6px 16px rgba(34,197,94,.25);transition:.15s}
+.btn:active{transform:scale(.97)}.btn:disabled{opacity:.55;box-shadow:none}
+.btn.a{background:linear-gradient(180deg,#fbb12a,#e89a0b);box-shadow:0 6px 16px rgba(245,158,11,.22)}
+.btn.w{background:linear-gradient(180deg,#2ee077,#1fb857);color:#fff;box-shadow:none}
+.btn.r{background:var(--rb);color:var(--r);border:1px solid rgba(239,68,68,.3);box-shadow:none}
+.btn.s{width:auto;padding:8px 14px;font-size:12px;display:inline-block;border-radius:999px}
+.link{background:0;border:0;color:var(--m);font-size:12px;font-weight:700;cursor:pointer;display:block;margin:12px auto 0;padding:6px 12px}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 10px;margin-bottom:8px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+.tab{background:var(--card);border:1px solid var(--b);color:var(--m);min-width:64px;padding:9px 12px;border-radius:16px;font-weight:700;font-size:12px;white-space:nowrap;cursor:pointer;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:2px;transition:.2s}
+.tab.on{background:var(--g);border-color:var(--g);color:#04130a;box-shadow:0 6px 16px rgba(34,197,94,.28)}
+.tab.on span{opacity:.8!important}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:var(--card2);border:1px solid var(--b);color:var(--m);padding:4px 11px;border-radius:999px;font-size:11px;font-weight:700}
+.item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 0;border-bottom:1px dashed var(--b)}.item:last-of-type{border:0}
+.tag{font-size:11px;padding:4px 10px;border-radius:999px;font-weight:800;background:var(--gg);color:var(--g);white-space:nowrap}
+.empty{text-align:center;color:var(--m);padding:28px 12px}
+.sc{background:var(--card);border:1px solid var(--b);border-radius:22px;margin-bottom:14px;overflow:hidden;box-shadow:var(--sh);transition:.25s}
+.sc.open{border-color:rgba(34,197,94,.45)}
+.sh{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:16px 18px;cursor:pointer;position:relative}
+.sh::before{content:"";position:absolute;inset-inline-start:0;top:18px;bottom:18px;width:3px;border-radius:3px;background:var(--g)}
+.sb{display:none;padding:14px 18px 18px;border-top:1px solid var(--b);background:rgba(255,255,255,.015)}.sc.open .sb{display:block}
+.sb img{border-radius:16px!important}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}@media(max-width:400px){.grid{grid-template-columns:repeat(3,1fr)}}
+.slot{border:1.5px solid var(--b);border-radius:14px;padding:10px 2px;text-align:center;font-weight:800;font-size:13px;background:var(--card2);transition:.15s}.slot small{display:block;font-size:10px;margin-top:2px;font-weight:700}
+.slot.av{cursor:pointer;border-color:rgba(34,197,94,.35)}.slot.av small{color:var(--g)}.slot.av:hover,.slot.av:active{background:var(--gg);border-color:var(--g);transform:translateY(-1px)}
+.slot.bk{background:var(--rb);border-color:transparent;color:#fca5a5}.slot.bk small{color:var(--r)}.slot.ps{opacity:.35;background:transparent;border-style:dashed}
+.modal{position:fixed;inset:0;background:rgba(5,7,11,.72);backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .2s}.modal.open{opacity:1;pointer-events:auto}
+.box{background:#161b26;border:1px solid var(--b);border-bottom:0;border-radius:28px 28px 0 0;width:100%;max-width:640px;max-height:90vh;overflow:auto;padding:12px 22px 26px;transform:translateY(30px);transition:.28s}.modal.open .box{transform:none}
+.box::before{content:"";display:block;width:44px;height:4px;border-radius:4px;background:rgba(255,255,255,.18);margin:0 auto 16px}
+.toast{position:fixed;top:18px;left:50%;transform:translate(-50%,-90px);background:#1b2233;border:1px solid rgba(34,197,94,.35);padding:11px 20px;border-radius:999px;font-weight:700;font-size:13px;box-shadow:0 12px 30px rgba(0,0,0,.5);z-index:200;opacity:0;transition:.3s;max-width:92vw}.toast.show{transform:translate(-50%,0);opacity:1}
+h2.t{font-size:18px;font-weight:800;margin-bottom:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="logo" href="index.html"><img src="https://i.ibb.co/xtbTJb4T/file-0000000034e0821092950d67e581aa6b.png" alt="STRIKE"></a>
+    <div class="nav"><span class="pill" data-a="my">🎟️ حجوزاتي</span><a class="pill" href="owner.html">صاحب ملعب؟</a></div>
+  </header>
+  <div class="card hero">
+    <h1 style="font-size:18px;font-weight:800;margin-bottom:4px">حجز الماتش أسهل من التمريرة! ⚽⚡</h1>
+    <p class="m">اختار اليوم، افتح الملعب، واضغط على الميعاد المتاح.</p>
+  </div>
+  <div class="card" data-a="om" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:12px 18px;border-color:rgba(245,158,11,.3)"><b>🔥 ماتشات ناقصها لاعيبة</b><span class="tag" id="opc">0</span></div>
+  <div class="tabs" id="tabs"></div>
+  <input id="q" placeholder="🔍 ابحث باسم الملعب أو المنطقة" style="margin-bottom:14px">
+  <div style="display:flex;gap:8px;margin-bottom:14px">
+    <select id="sz"><option value="">كل الأحجام</option><option>5</option><option>6</option><option>7</option><option>8</option><option>11</option></select>
+    <select id="so"><option value="">الترتيب: الافتراضي</option><option value="p">الأرخص أولاً</option></select>
+  </div>
+  <div id="list"><div class="empty">جاري تحميل الملاعب... ⏳</div></div>
+</div>
+<div class="modal" id="md"><div class="box" id="mb"></div></div>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+import * as D from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+
+/* ================= 1) CONFIG ================= */
+const CFG = {
+  firebase: {
+    apiKey: "AIzaSyA953dxWl1Bmtibt2XiENFWhA5H3UYXIOY", authDomain: "football-129f.firebaseapp.com",
+    databaseURL: "https://football-129f1-default-rtdb.europe-west1.firebasedatabase.app", projectId: "football-129f",
+    appId: "1:67021423540:web:44ad608572099a34c568e1"
+  },
+  root: "strike_data", imgKey: "6d207e02198a847aa98d0a2a901485a5",
+  holdMs: 30 * 6e4, cancelLeadMs: 2 * 36e5, daysAhead: 30, dayStartsAt: 6, maxMine: 60
+};
+const DAYS = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+const FAC = ["إضاءة", "كافيه", "حمامات", "باركينج", "أرضية صناعي", "غرف ملابس"];
+
+/* ================= 2) UTILS (pure) ================= */
+const $ = i => document.getElementById(i), $$ = q => [...document.querySelectorAll(q)];
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const arr = x => Array.isArray(x) ? x.filter(v => v != null) : Object.values(x || {});
+const digits = v => String(v).replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/\D/g, "");
+const okPhone = p => /^01[0125]\d{8}$/.test(p);
+const dayKey = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const fmt = h => { h %= 24; return `${String(h % 12 || 12).padStart(2, "0")}:00 ${h >= 12 ? "م" : "ص"}`; };
+const bizNow = () => new Date(Date.now() - CFG.dayStartsAt * 36e5);
+const hoursNow = () => { const b = bizNow(); return (Date.now() - new Date(b.getFullYear(), b.getMonth(), b.getDate())) / 36e5; };
+const startOf = (d, h) => new Date(d + "T00:00:00").getTime() + (+h || 0) * 36e5;
+const openHour = s => Number.isInteger(s.openHour) ? s.openHour : 17;
+const hoursOf = s => { const o = openHour(s); let c = Number.isInteger(s.closeHour) ? s.closeHour : 1; if (c <= o) c += 24; return Array.from({ length: c - o }, (_, i) => o + i); };
+const priceAt = (s, h) => { const base = Number(s.pricePerHour) || 0; let p = s.peakFrom; if (!(+s.peakPrice > 0) || !Number.isInteger(p)) return base; if (p < openHour(s)) p += 24; return h >= p ? +s.peakPrice : base; };
+const isDayOff = (s, dow) => arr(s.daysOff).map(Number).includes(dow);
+const waLink = (p, t = "") => `https://wa.me/20${p.slice(1)}?text=${encodeURIComponent(t)}`;
+const safeUrl = u => /^https?:\/\//i.test(u || "") ? esc(u) : "";
+const randKey = () => [...crypto.getRandomValues(new Uint8Array(14))].map(x => (x % 36).toString(36)).join("");
+const store = { get: (k, d) => { try { return JSON.parse(localStorage[k]) || d; } catch { return d; } }, set: (k, v) => { localStorage[k] = JSON.stringify(v); } };
+const isDenied = e => String(e?.code || e?.message).includes("PERMISSION");
+const shrink = (f, max, q, lim) => new Promise((ok, no) => {
+  const im = new Image(), u = URL.createObjectURL(f);
+  im.onload = () => { const z = Math.min(1, max / Math.max(im.width, im.height)), c = document.createElement("canvas"); c.width = Math.round(im.width * z); c.height = Math.round(im.height * z); c.getContext("2d").drawImage(im, 0, 0, c.width, c.height); let r = c.toDataURL("image/jpeg", q); while (r.length > lim && q > .3) { q -= .1; r = c.toDataURL("image/jpeg", q); } URL.revokeObjectURL(u); ok(r); };
+  im.onerror = () => no(new Error("صورة غير صالحة")); im.src = u;
+});
+
+/* ================= 3) DATA LAYER (Firebase only here) ================= */
+const db = D.getDatabase(initializeApp(CFG.firebase));
+const R = p => D.ref(db, `${CFG.root}/${p}`), P = p => `${CFG.root}/${p}`;
+const slotPaths = e => ({ [P(`slots/${e.date}/${e.id}/h${e.h}`)]: null, [P(`bookings/${e.id}/${e.date}/h${e.h}`)]: null, [P(`open/${e.id}_${e.date}_h${e.h}`)]: null });
+const api = {
+  watch: (path, cb, onErr = () => { }) => D.onValue(R(path), s => cb(s.val()), onErr),
+  watchRaw: (ref, cb) => D.onValue(D.ref(db, ref), s => cb(s.val()), () => { }),
+  photo: id => D.get(R("photos/" + id)).then(x => x.val() || "").catch(() => ""),
+  depStatus: ck => D.get(R("depStatus/" + ck)).then(x => !!x.val()).catch(() => false),
+  /** كتابة ذرية: لو الميعاد اتحجز قبلك الـ update كله بيترفض */
+  async reserve({ s, id, h, date, name, phone, ready, need, weekly, deposit, now }) {
+    const price = priceAt(s, h), code = "STK-" + Math.floor(1000 + Math.random() * 9000), sr = weekly > 1 ? "S" + Date.now().toString(36) : "";
+    const dpq = Number(s.deposit) > 0 && !!s.payNo, dl = now + CFG.holdMs, made = []; let skipped = 0;
+    for (let i = 0; i < weekly; i++) {
+      const d = new Date(date + "T00:00:00"); d.setDate(d.getDate() + 7 * i); const k = dayKey(d);
+      if (i && isDayOff(s, d.getDay())) { skipped++; continue; }
+      const ck = randKey();
+      const up = {
+        [P(`slots/${k}/${id}/h${h}`)]: dpq ? dl : true,
+        [P(`bookings/${id}/${k}/h${h}`)]: { name, phone, ready: ready + (weekly > 1 ? " • ثابت أسبوعي" : ""), code, ckey: ck, hour: fmt(h), price, status: "pending_confirmation", ts: Date.now(), ...(dpq ? { dpReq: Number(s.deposit), dl } : {}), ...(sr ? { sr } : {}) }
+      };
+      if (need > 0 && !i) up[P(`open/${id}_${k}_h${h}`)] = { sid: id, date: k, h, hour: fmt(h), stadium: s.name, area: s.area || "", size: s.size || null, price, cap: name, phone, need, ts: Date.now() };
+      try { await D.update(D.ref(db), up); } catch (e) { if (!i) throw e; skipped++; continue; }
+      made.push({ code, date: k, hour: fmt(h), h, id, ck, stadium: s.name, phone: s.ownerPhone || "", n: name, pp: phone, dp: i ? 0 : Number(s.deposit) || 0, pn: s.payNo || "", op: need > 0 && !i, sr, dl: dpq ? dl : 0 });
+    }
+    return { made, skipped, dpq, dl };
+  },
+  release: e => D.update(D.ref(db), slotPaths(e)),
+  async cancel(e) {
+    await D.set(R("tok/" + e.ck), true);
+    try {
+      await D.update(D.ref(db), { ...slotPaths(e), [P(`tok/${e.ck}`)]: null, [P(`cancelled/${e.id}/${e.date}/h${e.h}`)]: { name: e.n || "", phone: e.pp || "", hour: e.hour, stadium: e.stadium, dep: !!e.dpSent, ts: Date.now() } });
+    } catch (x) { D.remove(R("tok/" + e.ck)).catch(() => { }); throw x; }
+  },
+  async closeAd(e) {
+    await D.set(R("tok/" + e.ck), true);
+    try { await D.update(D.ref(db), { [P(`open/${e.id}_${e.date}_h${e.h}`)]: null, [P(`tok/${e.ck}`)]: null }); }
+    catch (x) { D.remove(R("tok/" + e.ck)).catch(() => { }); throw x; }
+  },
+  async rate(e, o) {
+    await D.set(R("tok/" + e.ck), true);
+    try { await D.update(D.ref(db), { [P(`ratings/${e.id}/${e.date}/h${e.h}`)]: o, [P(`tok/${e.ck}`)]: null }); }
+    catch (x) { D.remove(R("tok/" + e.ck)).catch(() => { }); throw x; }
+  },
+  async sendDeposit(targets, o) {
+    const up = {}; targets.forEach(q => { up[P(`bookings/${q.id}/${q.date}/h${q.h}/dep`)] = { ...o, k: q.ck }; });
+    try { await D.update(D.ref(db), up); return targets; }
+    catch (first) { const ok = []; for (const q of targets) { try { await D.set(R(`bookings/${q.id}/${q.date}/h${q.h}/dep`), { ...o, k: q.ck }); ok.push(q); } catch { } } if (!ok.length) throw first; return ok; }
+  },
+  async uploadImage(dataUrl) {
+    const fd = new FormData(); fd.append("key", CFG.imgKey); fd.append("action", "upload"); fd.append("format", "json"); fd.append("source", dataUrl.split(",")[1]);
+    const j = await (await fetch("https://freeimage.host/api/1/upload", { method: "POST", body: fd })).json(), u = j?.image?.display_url || j?.image?.url;
+    if (!u) throw new Error("فشل رفع الصورة"); return u.replace(/^http:/, "https:");
+  }
+};
+
+/* ================= 4) STATE ================= */
+const S = { stadiums: null, paid: {}, slots: {}, open: {}, ratings: {}, photos: {}, biz: { billingMode: "hybrid" }, date: dayKey(bizNow()), openIds: new Set(), offset: 0, offSlots: null };
+{ const dl = new URLSearchParams(location.search).get("s"); if (dl) S.openIds.add(dl); }
+const now = () => Date.now() + S.offset;
+const mine = () => store.get("strike_my", []), saveMine = l => store.set("strike_my", l.slice(0, CFG.maxMine));
+const patchMine = (ck, fn) => { const L = mine(), z = L.find(x => x.ck == ck); if (z) { fn(z); saveMine(L); } };
+const ratingsOf = id => Object.values(S.ratings[id] || {}).flatMap(x => Object.values(x));
+const openList = () => Object.values(S.open).filter(o => o && startOf(o.date, o.h) > Date.now()).sort((a, b) => startOf(a.date, a.h) - startOf(b.date, b.h));
+
+/* ================= 5) UI HELPERS ================= */
+const md = $("md"), mb = $("mb");
+const modal = h => { mb.dataset.v = ""; mb.innerHTML = h; md.classList.add("open"); }, hide = () => md.classList.remove("open");
+md.onclick = e => e.target == md && hide();
+let toastT; const toast = m => { const t = $("toast"); t.textContent = m; t.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), 3500); };
+const fail = e => { $("list").innerHTML = `<div class="empty" style="color:var(--r)">${isDenied(e) ? "مفيش صلاحية قراءة — راجع قواعد Firebase" : esc(e.message || e.code)}</div>`; };
+const go = u => { if (!window.open(u, "_blank")) location.href = u; };
+const share = t => navigator.share ? navigator.share({ text: t }).catch(() => { }) : go("https://api.whatsapp.com/send?text=" + encodeURIComponent(t));
+const busy = async (btn, fn) => { btn.disabled = true; try { await fn(); } catch (e) { toast(isDenied(e) ? "العملية مرفوضة — جرّب تاني" : (e.message || e.code)); } finally { btn.disabled = false; } };
+
+/* ================= 6) VIEWS ================= */
+function stadiumVisible(s) { return s && s.status == "active" && (S.biz.billingMode === "commission" || S.paid[s.ownerUid] > Date.now()); }
+const ratingText = id => { const r = ratingsOf(id); return r.length ? ` • ⭐ ${(r.reduce((t, x) => t + (+x.s || 0), 0) / r.length).toFixed(1)} (${r.length})` : ""; };
+
+function renderTabs() {
+  $("tabs").innerHTML = Array.from({ length: CFG.daysAhead }, (_, i) => {
+    const d = bizNow(); d.setDate(d.getDate() + i);
+    return `<div class="tab ${dayKey(d) == S.date ? "on" : ""}" data-a="day" data-k="${dayKey(d)}"><b>${i ? (i == 1 ? "بكرة" : DAYS[d.getDay()]) : "النهاردة"}</b><span style="font-size:10px;opacity:.7">${d.getDate()}/${d.getMonth() + 1}</span></div>`;
+  }).join("");
+}
+
+function renderList() {
+  if (!S.stadiums) return;
+  const q = $("q").value.trim().toLowerCase(), size = $("sz").value, isToday = S.date == dayKey(bizNow()), nh = hoursNow(), dow = new Date(S.date + "T00:00:00").getDay();
+  const items = Object.entries(S.stadiums).filter(([, s]) => stadiumVisible(s) && `${s.name} ${s.area}`.toLowerCase().includes(q) && (!size || s.size == size));
+  if ($("so").value == "p") items.sort((a, b) => a[1].pricePerHour - b[1].pricePerHour);
+  if (!items.length) { $("list").innerHTML = `<div class="empty">مفيش ملاعب متاحة دلوقتي يا كابتن!</div>`; return; }
+  $("list").innerHTML = items.map(([id, s]) => {
+    const hs = hoursOf(s), off = isDayOff(s, dow), taken = S.slots[id] || {}, isOpen = S.openIds.has(id), gone = h => isToday && nh >= h;
+    if (isOpen && !(id in S.photos)) { S.photos[id] = ""; api.photo(id).then(u => { S.photos[id] = u; renderList(); }); }
+    const free = off ? 0 : hs.filter(h => !taken["h" + h] && !gone(h)).length;
+    const chips = (+s.deposit > 0 ? `<span class="chip" style="color:var(--a);border-color:var(--a)">💵 عربون ${esc(s.deposit)} ج.م</span>` : "") + arr(s.facilities).map(i => FAC[i] ? `<span class="chip">${FAC[i]}</span>` : "").join("");
+    const mp = safeUrl(s.mapUrl), ph = digits(s.ownerPhone || "");
+    const links = `<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap"><button class="btn s" data-a="sh" data-id="${esc(id)}">🔗 مشاركة</button>${mp ? `<button class="btn s" data-a="wo" data-u="${mp}">📍 اللوكيشن</button>` : ""}${okPhone(ph) ? `<button class="btn s w" data-a="wo" data-u="${waLink(ph)}">واتساب</button><a class="btn s a" href="tel:${ph}">اتصال</a>` : ""}</div>`;
+    const pics = S.photos[id] ? `<img src="${esc(S.photos[id])}" alt="" style="width:100%;max-height:190px;object-fit:cover;border-radius:12px;margin-bottom:10px">` : "";
+    const grid = off ? `<div class="empty" style="color:var(--r)">الملعب مقفول في اليوم ده 🚫</div>` : `<div class="grid">${hs.map(h => {
+      const t = taken["h" + h];
+      return t ? `<div class="slot bk">${fmt(h)}<small>${typeof t == "number" ? "⏳ بانتظار عربون" : "محجوز"}</small></div>`
+        : gone(h) ? `<div class="slot ps">${fmt(h)}<small>عدّى</small></div>`
+          : `<div class="slot av" data-a="book" data-id="${esc(id)}" data-h="${h}">${fmt(h)}<small>${priceAt(s, h)} ج.م 🔥</small></div>`;
+    }).join("")}</div>`;
+    return `<div class="sc ${isOpen ? "open" : ""}"><div class="sh" data-a="tg" data-id="${esc(id)}"><div>
+      <div style="font-size:16px;font-weight:800">${esc(s.name)}</div>
+      <div class="m">📍 ${esc(s.area)}${s.size ? ` • ⚽ ${esc(s.size)} ضد ${esc(s.size)}` : ""}${ratingText(id)}</div>
+      <div class="m" style="color:var(--a)">🕒 ${fmt(hs[0])} ← ${fmt(hs[hs.length - 1] + 1)}</div></div>
+      <div style="text-align:left"><span class="tag">${esc(s.pricePerHour)}${+s.peakPrice > 0 && Number.isInteger(s.peakFrom) ? "–" + esc(s.peakPrice) : ""} ج.م / ساعة</span>
+      <div class="m" style="margin-top:6px;color:${free ? "var(--g)" : "var(--r)"}">${off ? "مقفول" : free ? free + " ميعاد متاح" : "كامل العدد"}</div></div></div>
+      <div class="sb">${pics}${chips ? `<div class="chips" style="margin-bottom:10px">${chips}</div>` : ""}${links}${grid}</div></div>`;
+  }).join("");
+}
+
+const depositBox = e => `<div class="card" style="margin:14px 0;border-color:var(--a);text-align:right"><b style="color:var(--a)">💵 عربون ${esc(e.dp)} ج.م لتأكيد الحجز</b><p class="m" style="margin:6px 0">حوّل على محفظة / إنستاباي: <b>${esc(e.pn)}</b></p><input id="dt" placeholder="رقم العملية بعد التحويل" style="margin-bottom:8px"><label>صورة التحويل (اختياري)</label><input id="df" type="file" accept="image/*" style="margin-bottom:8px"><button class="btn a" data-a="dp" data-c="${esc(e.ck)}">أكّدت التحويل 📩</button></div>`;
+
+function viewBook(id, h) {
+  const s = S.stadiums[id], me = store.get("strike_me", {}), opt = (arr2, f) => arr2.map(f).join("");
+  S.cur = { id, h: +h };
+  modal(`<h2 class="t">${esc(s.name)}</h2><p class="m" style="margin-bottom:14px">${S.date} — ${fmt(h)} • ${priceAt(s, +h)} ج.م (الدفع في الملعب)</p>
+    <div class="fg"><label>اسم الكابتن</label><input id="bn" value="${esc(me.n || "")}" placeholder="مثال: الكابتن أحمد"></div>
+    <div class="fg"><label>رقم الموبايل للتأكيد</label><input id="bp" type="tel" inputmode="numeric" value="${esc(me.p || "")}" placeholder="01xxxxxxxxx"></div>
+    <div class="fg"><label>حالة الفرقة إيه؟</label><select id="br"><option>الرجالة جاهزة والماتش هيدولق 🔥</option><option>بنلم في الفرقة بالعافية ⏳</option></select></div>
+    <div class="fg"><label>🔁 حجز ثابت؟ (نفس الساعة كل أسبوع)</label><select id="bw"><option value="1">مرة واحدة</option><option value="4">4 أسابيع</option><option value="8">8 أسابيع</option><option value="12">12 أسبوع</option></select></div>
+    <div class="fg"><label>ناقصكم لاعيبة؟ (رقمك هيظهر للي عايز ينضم)</label><select id="bo"><option value="0">لا، الفرقة كاملة</option>${opt([1, 2, 3, 4, 5], n => `<option value="${n}">ناقصنا ${n}</option>`)}</select></div>
+    ${s.deposit > 0 ? `<p class="m" style="margin-bottom:10px;color:var(--a)">💵 الملعب بيطلب عربون ${esc(s.deposit)} ج.م بعد الحجز</p>` : ""}
+    <button class="btn" data-a="go">قفل على الميعاد ده 🔒</button><button class="link" data-a="x">إلغاء</button>`);
+}
+
+function viewSuccess({ made, skipped, dpq, dl }, s, weeks, h, name, need) {
+  const e = made[0], t = `يا رجالة الماتش اتقفل! ⚽🔥\n📍 ${s.name}\n📅 ${S.date}${made.length > 1 ? " (ثابت كل أسبوع × " + made.length + ")" : ""}\n⏰ ${fmt(h)}\n👤 الكابتن ${name}\n🎟️ #${e.code}\nجاهزين؟ ⚡`;
+  modal(`<div style="text-align:center"><div style="font-size:40px">🎉</div><h2 class="t">مبروك يا كابتن! الماتش اتسجل</h2>
+    <p class="m" style="margin:6px 0 14px">كود الحجز <b style="color:var(--g)">#${e.code}</b> — محفوظ في "حجوزاتي"${made.length > 1 ? `<br>🔁 اتحجز ${made.length} من ${weeks} أسبوع${skipped ? " (اتخطّى " + skipped + ")" : ""}` : ""}${need > 0 ? '<br>🔥 ماتشك ظاهر في "ناقصنا لاعيبة"' : ""}</p>
+    ${dpq ? `<p class="m" style="color:var(--r);margin:10px 0">⏳ الميعاد متثبّت لحد <b id="cd">30:00</b> — ابعت التحويل قبل كده وإلا هيتلغي تلقائياً</p>` : ""}${e.dp > 0 && e.pn ? depositBox(e) : ""}
+    <button class="btn w" data-a="ws" data-t="${esc(t)}">ابعت التفاصيل لجروب الفرقة 📲</button><button class="link" data-a="x">إغلاق</button></div>`);
+  if (dpq) { const iv = setInterval(() => { const el = $("cd"); if (!el || !md.classList.contains("open")) return clearInterval(iv); const r = Math.max(0, Math.ceil((dl - now()) / 1e3)); el.textContent = String(Math.floor(r / 60)).padStart(2, "0") + ":" + String(r % 60).padStart(2, "0"); }, 1000); }
+}
+
+function viewMine() {
+  const t = dayKey(new Date(Date.now() - 14 * 864e5)), list = mine().filter(x => x.date >= t);
+  modal(`<h2 class="t">حجوزاتي 🎟️</h2>${list.map(x => {
+    const at = startOf(x.date, x.h), fut = at > Date.now(), can = fut && x.ck && at - Date.now() > CFG.cancelLeadMs, expired = x.dl && x.dl < now();
+    const depLine = x.dp && fut ? `<div class="m" style="color:var(--a)">${x.dpOk ? "✅ العربون اتأكد" : x.dpSent ? "💵 العربون اتبعت للتأكيد" : "💵 مطلوب عربون " + esc(x.dp) + " ج.م" + (x.dl ? (!expired ? " • ⏳ باقي " + Math.ceil((x.dl - now()) / 6e4) + " دقيقة" : " • ⚠️ انتهت المهلة") : "")}</div>` : "";
+    const c = esc(x.ck);
+    return `<div class="item" style="align-items:flex-start"><div><b>${esc(x.stadium)}</b><div class="m">${esc(x.date)} • ${esc(x.hour)} • #${esc(x.code)}${x.sr ? " • 🔁 ثابت" : ""}</div>${depLine}</div>
+      <div style="display:flex;flex-direction:column;gap:6px">${okPhone(digits(x.phone)) ? `<button class="btn s w" data-a="wo" data-u="${waLink(digits(x.phone), "بخصوص حجز #" + x.code)}">كلّم الملعب</button>` : ""}
+      ${fut && x.dp && x.pn && !x.dpSent && !expired ? `<button class="btn s a" data-a="dm" data-c="${c}">ادفع العربون</button>` : ""}
+      ${fut && x.op ? `<button class="btn s" data-a="cl" data-c="${c}">اقفل إعلان اللاعيبة</button>` : ""}
+      ${can ? `<button class="btn s r" data-a="cx" data-c="${c}">إلغاء الحجز</button>` : ""}${can && x.sr ? `<button class="btn s r" data-a="cs" data-c="${c}">إلغاء كل الأسابيع</button>` : ""}
+      ${!fut && x.ck && !x.rated ? `<button class="btn s a" data-a="rate" data-c="${c}">قيّم ⭐</button>` : ""}</div></div>`;
+  }).join("") || `<div class="empty">مفيش حجوزات لسه.</div>`}<p class="m" style="margin-top:10px">الإلغاء متاح لحد ساعتين قبل الماتش.</p><button class="link" data-a="x">إغلاق</button>`);
+  mb.dataset.v = "my";
+  reconcileMine();
+}
+
+/** تحرير مهل العربون المنتهية + مزامنة تأكيد العربون */
+async function reconcileMine() {
+  const refresh = () => { if (mb.dataset.v == "my" && md.classList.contains("open")) viewMine(); };
+  for (const e of mine().filter(x => x.dl && x.dl < now() && !x.dpSent && x.ck && x.id)) {
+    try { await api.release(e); saveMine(mine().filter(q => q.ck != e.ck)); toast("الميعاد اتحرر لانتهاء مهلة العربون"); refresh(); } catch { }
+  }
+  for (const e of mine().filter(x => x.dpSent && !x.dpOk && x.ck)) if (await api.depStatus(e.ck)) { patchMine(e.ck, z => z.dpOk = true); refresh(); }
+}
+
+function viewOpen() {
+  modal(`<h2 class="t">🔥 ماتشات ناقصها لاعيبة</h2>${openList().map(o => `<div class="item"><div><b>${esc(o.stadium)}</b>
+    <div class="m">📅 ${esc(o.date)} • ${esc(o.hour)}${o.area ? " • 📍 " + esc(o.area) : ""}${o.size ? " • " + esc(o.size) + " ضد " + esc(o.size) : ""}</div>
+    <div class="m" style="color:var(--a)">ناقص ${esc(o.need)} • الكابتن ${esc(o.cap)}${o.size && o.price ? " • حوالي " + Math.round(o.price / (o.size * 2)) + " ج.م للاعب" : ""}</div></div>
+    <button class="btn s w" data-a="wo" data-u="${waLink(String(o.phone), "أنا من STRIKE وعايز أنضم لماتش " + o.stadium + " يوم " + o.date + " الساعة " + o.hour)}">انضم 💬</button></div>`).join("") || `<div class="empty">مفيش ماتشات ناقصة دلوقتي.</div>`}<button class="link" data-a="x">إغلاق</button>`);
+}
+
+/* ================= 7) ACTIONS (controller) ================= */
+const A = {
+  day: d => { S.date = d.k; S.slots = {}; renderTabs(); watchSlots(); renderList(); },
+  tg: d => { S.openIds.has(d.id) ? S.openIds.delete(d.id) : S.openIds.add(d.id); renderList(); },
+  sh: d => share(`${S.stadiums[d.id].name} — احجز من هنا 👇\n${location.origin + location.pathname}?s=${d.id}`),
+  x: hide, wo: d => go(d.u), ws: d => share(d.t),
+  book: d => viewBook(d.id, d.h),
+  go: (_, b) => busy(b, async () => {
+    const name = $("bn").value.trim().slice(0, 40), phone = digits($("bp").value), need = +$("bo").value || 0, weekly = +$("bw").value || 1;
+    if (name.length < 2) return toast("اكتب اسمك");
+    if (!okPhone(phone)) return toast("رقم الموبايل غير صحيح");
+    const { id, h } = S.cur, s = S.stadiums[id];
+    try {
+      const res = await api.reserve({ s, id, h, date: S.date, name, phone, ready: $("br").value, need, weekly, now: now() });
+      store.set("strike_me", { n: name, p: phone }); saveMine([...res.made, ...mine()]);
+      viewSuccess(res, s, weekly, h, name, need);
+    } catch (e) { toast(isDenied(e) ? "الميعاد ده اتحجز قبلك يا كابتن! جرب ميعاد تاني" : (e.message || e.code)); hide(); }
+  }),
+  my: viewMine, om: viewOpen,
+  dm: d => { const e = mine().find(x => x.ck == d.c); if (e) modal(`<h2 class="t">عربون الحجز</h2>${depositBox(e)}<button class="link" data-a="x">إغلاق</button>`); },
+  dp: (d, b) => busy(b, async () => {
+    const e = mine().find(x => x.ck == d.c); if (!e) return;
+    if (e.dl && now() > e.dl) { toast("انتهت مهلة العربون والميعاد اتحرر"); return viewMine(); }
+    const trx = ($("dt").value || "").trim().slice(0, 40), f = $("df").files[0];
+    if (trx.length < 4 && !f) return toast("اكتب رقم العملية أو ارفع صورة التحويل");
+    let img = ""; if (f) { try { img = await api.uploadImage(await shrink(f, 1280, .75, 1.5e6)); } catch { toast("تعذر رفع الصورة — كمّل برقم العملية"); } }
+    if (trx.length < 4 && !img) return toast("اكتب رقم العملية");
+    const o = { trx: trx.length >= 4 ? trx : "صورة", ts: Date.now(), ...(img ? { img } : {}) };
+    const targets = mine().filter(z => z.ck == e.ck || (e.sr && z.sr == e.sr && startOf(z.date, z.h) > Date.now()));
+    const sent = await api.sendDeposit(targets, o);
+    sent.forEach(q => patchMine(q.ck, z => z.dpSent = true)); toast("اتبعت للملعب ✅ هيأكد العربون"); hide();
+  }),
+  cx: (d, b) => busy(b, async () => {
+    const e = mine().find(x => x.ck == d.c); if (!e || !confirm("تأكيد إلغاء الحجز؟")) return;
+    await api.cancel(e); saveMine(mine().filter(x => x.ck != e.ck)); toast("تم إلغاء الحجز ✅"); viewMine();
+  }),
+  cs: (d, b) => busy(b, async () => {
+    const e = mine().find(x => x.ck == d.c); if (!e?.sr || !confirm("إلغاء كل الأسابيع الجاية في الحجز الثابت؟")) return;
+    let n = 0; for (const x of mine().filter(q => q.sr == e.sr && q.ck && startOf(q.date, q.h) - Date.now() > CFG.cancelLeadMs)) { try { await api.cancel(x); saveMine(mine().filter(q => q.ck != x.ck)); n++; } catch { } }
+    toast(`تم إلغاء ${n} حجز ✅`); viewMine();
+  }),
+  cl: (d, b) => busy(b, async () => { const e = mine().find(x => x.ck == d.c); if (!e) return; await api.closeAd(e); patchMine(e.ck, z => z.op = false); toast("تم قفل الإعلان"); viewMine(); }),
+  rate: d => {
+    const e = mine().find(x => x.ck == d.c); if (!e) return; S.stars = 0;
+    modal(`<h2 class="t">قيّم ${esc(e.stadium)}</h2><div id="stars" style="font-size:32px;text-align:center;margin:12px 0">${[1, 2, 3, 4, 5].map(i => `<span data-a="star" data-v="${i}" style="cursor:pointer;opacity:.35">⭐</span>`).join("")}</div>
+      <div class="fg"><input id="rc" maxlength="80" placeholder="تعليق (اختياري)"></div><button class="btn" data-a="rs" data-c="${esc(e.ck)}">ابعت التقييم</button><button class="link" data-a="x">إلغاء</button>`);
+  },
+  star: d => { S.stars = +d.v; $$("#stars span").forEach((x, i) => x.style.opacity = i < S.stars ? 1 : .35); },
+  rs: (d, b) => busy(b, async () => {
+    if (!S.stars) return toast("اختار عدد النجوم");
+    const e = mine().find(x => x.ck == d.c); if (!e) return;
+    const c = $("rc").value.trim().slice(0, 80), o = { s: S.stars, ts: Date.now(), ...(c ? { c } : {}) };
+    await api.rate(e, o); patchMine(e.ck, z => z.rated = true); toast("شكراً على تقييمك ⭐"); viewMine();
+  })
+};
+document.addEventListener("click", e => { const b = e.target.closest("[data-a]"); if (b && A[b.dataset.a]) A[b.dataset.a](b.dataset, b); });
+$("q").oninput = $("sz").onchange = $("so").onchange = renderList;
+
+/* ================= 8) BOOTSTRAP ================= */
+let offSlots = null;
+function watchSlots() {
+  offSlots && offSlots();
+  offSlots = api.watch(`slots/${S.date}`, v => {
+    S.slots = v || {}; renderList();
+    // تحرير تلقائي لمهل العربون المنتهية
+    Object.entries(S.slots).forEach(([id, hs]) => Object.entries(hs).forEach(([k, val]) => {
+      const key = id + S.date + k;
+      if (typeof val == "number" && val < now() && !(S._rel ||= new Set()).has(key)) { S._rel.add(key); api.release({ id, date: S.date, h: +k.slice(1) }).catch(() => { }); }
+    }));
+  }, fail);
+}
+renderTabs();
+api.watch("stadiums", v => { S.stadiums = v || {}; renderList(); }, fail);
+api.watch("paid", v => { S.paid = v || {}; renderList(); }, fail);
+api.watch("config/business", v => { S.biz = v || S.biz; renderList(); });
+api.watch("open", v => { S.open = v || {}; $("opc").textContent = openList().length; });
+api.watch("ratings", v => { S.ratings = v || {}; renderList(); });
+api.watchRaw(".info/serverTimeOffset", v => { S.offset = v || 0; });
+watchSlots();
+setInterval(() => { if (!md.classList.contains("open")) renderList(); }, 60000);
+setTimeout(() => { if (S.stadiums === null) $("list").innerHTML = `<div class="empty" style="color:var(--r);line-height:1.8">⚠️ مش قادر أوصل لقاعدة البيانات. راجع databaseURL والقواعد في Firebase.</div>`; }, 8000);
+</script>
+</body>
+</html>
